@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title desc">
+  <title id="title">Sports edit visual</title>
+  <desc id="desc">Dynamic sports edit composition with field marks and motion streaks.</desc>
+  <defs>
+    <radialGradient id="spot" cx="48%" cy="42%" r="58%">
+      <stop offset="0" stop-color="#1a2b35"/>
+      <stop offset="0.62" stop-color="#080b12"/>
+      <stop offset="1" stop-color="#05070d"/>
+    </radialGradient>
+    <linearGradient id="trail" x1="0" x2="1">
+      <stop offset="0" stop-color="#43d9ff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#43d9ff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffb54a" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="720" fill="url(#spot)"/>
+  <g opacity="0.16" stroke="#ffffff">
+    <path d="M120 156h720M120 360h720M120 564h720"/>
+    <circle cx="480" cy="360" r="118" fill="none"/>
+    <path d="M480 120v480"/>
+  </g>
+  <path d="M154 500c146-112 278-142 396-90 98 42 182 12 254-88" fill="none" stroke="url(#trail)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M380 182c72 36 108 96 108 178s-36 142-108 178c-52-52-78-112-78-178s26-126 78-178z" fill="#ffffff" opacity="0.08" stroke="#43d9ff" stroke-opacity="0.3"/>
+  <circle cx="548" cy="378" r="42" fill="#4cf0b5" opacity="0.22"/>
+  <circle cx="548" cy="378" r="14" fill="#4cf0b5" opacity="0.82"/>
+  <rect x="116" y="94" width="270" height="78" rx="18" fill="#ffffff" opacity="0.055" stroke="#ffffff" stroke-opacity="0.13"/>
+  <rect x="144" y="122" width="122" height="16" rx="8" fill="#43d9ff" opacity="0.58"/>
+  <rect x="144" y="150" width="186" height="8" rx="4" fill="#ffffff" opacity="0.18"/>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title desc">
+  <title id="title">Cultural campaign visual</title>
+  <desc id="desc">Dark editorial campaign layout with soft cyan, emerald, and amber accents.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#070a12"/>
+      <stop offset="0.52" stop-color="#101827"/>
+      <stop offset="1" stop-color="#070a12"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#43d9ff" stop-opacity="0.72"/>
+      <stop offset="0.55" stop-color="#4cf0b5" stop-opacity="0.52"/>
+      <stop offset="1" stop-color="#ffb54a" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="960" height="720" fill="url(#bg)"/>
+  <g opacity="0.18">
+    <path d="M0 140h960M0 260h960M0 380h960M0 500h960M0 620h960M160 0v720M320 0v720M480 0v720M640 0v720M800 0v720" stroke="#fff"/>
+  </g>
+  <circle cx="228" cy="192" r="116" fill="#43d9ff" opacity="0.18" filter="url(#soft)"/>
+  <circle cx="766" cy="534" r="154" fill="#ffb54a" opacity="0.16" filter="url(#soft)"/>
+  <path d="M128 456c128-86 242-104 342-52 104 54 202 42 362-84" fill="none" stroke="url(#ribbon)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M128 512c138-68 254-78 350-28 104 54 206 40 354-70" fill="none" stroke="#f36cff" stroke-width="3" opacity="0.55"/>
+  <rect x="110" y="96" width="306" height="234" rx="18" fill="#ffffff" opacity="0.055" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect x="542" y="110" width="294" height="172" rx="18" fill="#ffffff" opacity="0.05" stroke="#43d9ff" stroke-opacity="0.2"/>
+  <rect x="574" y="142" width="132" height="18" rx="9" fill="#43d9ff" opacity="0.55"/>
+  <rect x="574" y="184" width="216" height="10" rx="5" fill="#ffffff" opacity="0.24"/>
+  <rect x="574" y="212" width="178" height="10" rx="5" fill="#ffffff" opacity="0.14"/>
+  <path d="M168 260c42-64 86-96 132-96 48 0 80 32 96 96-54 30-108 45-162 45-24 0-46-15-66-45z" fill="#4cf0b5" opacity="0.28"/>
+</svg>

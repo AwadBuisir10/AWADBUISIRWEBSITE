@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title desc">
+  <title id="title">Community analytics visual</title>
+  <desc id="desc">Clean campaign analytics dashboard visual with growth curves and metric panels.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#070a12"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="curve" x1="0" x2="1">
+      <stop offset="0" stop-color="#43d9ff"/>
+      <stop offset="0.55" stop-color="#4cf0b5"/>
+      <stop offset="1" stop-color="#ffb54a"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="720" fill="url(#bg)"/>
+  <rect x="104" y="82" width="752" height="556" rx="28" fill="#ffffff" opacity="0.047" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect x="146" y="136" width="194" height="124" rx="20" fill="#ffffff" opacity="0.055" stroke="#43d9ff" stroke-opacity="0.18"/>
+  <rect x="384" y="136" width="194" height="124" rx="20" fill="#ffffff" opacity="0.055" stroke="#4cf0b5" stroke-opacity="0.16"/>
+  <rect x="622" y="136" width="194" height="124" rx="20" fill="#ffffff" opacity="0.055" stroke="#ffb54a" stroke-opacity="0.16"/>
+  <rect x="168" y="174" width="86" height="18" rx="9" fill="#43d9ff" opacity="0.62"/>
+  <rect x="406" y="174" width="100" height="18" rx="9" fill="#4cf0b5" opacity="0.5"/>
+  <rect x="644" y="174" width="78" height="18" rx="9" fill="#ffb54a" opacity="0.54"/>
+  <rect x="146" y="330" width="670" height="236" rx="24" fill="#05070d" opacity="0.48" stroke="#ffffff" stroke-opacity="0.1"/>
+  <g opacity="0.14" stroke="#ffffff">
+    <path d="M178 386h596M178 442h596M178 498h596M250 354v180M384 354v180M518 354v180M652 354v180"/>
+  </g>
+  <path d="M180 510c88-86 156-102 204-48 42 48 82 44 120-12 52-76 114-82 186-18 32 30 62 22 90-24" fill="none" stroke="url(#curve)" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="690" cy="432" r="11" fill="#ffb54a"/>
+</svg>

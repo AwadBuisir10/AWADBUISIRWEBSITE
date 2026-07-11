@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title desc">
+  <title id="title">Brand grid visual</title>
+  <desc id="desc">Brand identity grid with marks, spacing, and color-study panels.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#05070d"/>
+      <stop offset="1" stop-color="#111521"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="720" fill="url(#bg)"/>
+  <g opacity="0.14" stroke="#ffffff">
+    <path d="M160 80v560M320 80v560M480 80v560M640 80v560M800 80v560M80 160h800M80 320h800M80 480h800"/>
+  </g>
+  <rect x="120" y="110" width="204" height="204" rx="24" fill="#ffffff" opacity="0.055" stroke="#43d9ff" stroke-opacity="0.22"/>
+  <rect x="374" y="110" width="204" height="204" rx="24" fill="#ffffff" opacity="0.045" stroke="#ffffff" stroke-opacity="0.13"/>
+  <rect x="628" y="110" width="204" height="204" rx="24" fill="#ffffff" opacity="0.05" stroke="#4cf0b5" stroke-opacity="0.18"/>
+  <path d="M222 172l54 94H168l54-94z" fill="#43d9ff" opacity="0.52"/>
+  <circle cx="476" cy="212" r="58" fill="#4cf0b5" opacity="0.36"/>
+  <path d="M674 176h112v26H674zM674 230h112v26H674z" fill="#ffb54a" opacity="0.45"/>
+  <rect x="120" y="386" width="712" height="92" rx="20" fill="#ffffff" opacity="0.045" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect x="154" y="422" width="188" height="16" rx="8" fill="#43d9ff" opacity="0.52"/>
+  <rect x="386" y="422" width="132" height="16" rx="8" fill="#4cf0b5" opacity="0.42"/>
+  <rect x="554" y="422" width="214" height="16" rx="8" fill="#f36cff" opacity="0.36"/>
+  <rect x="120" y="530" width="330" height="52" rx="16" fill="#ffffff" opacity="0.045"/>
+  <rect x="498" y="530" width="334" height="52" rx="16" fill="#ffffff" opacity="0.045"/>
+</svg>

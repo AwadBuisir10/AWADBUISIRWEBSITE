@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+
+  /* Core text/border tokens (mirrored in tailwind.config.ts). */
+  --text: #111a4a;
+  --muted-text: #7c7f88;
+  --dim-text: #a9acb6;
+  --border: #e3e4e8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f6f6f8;
+  /* Cool near-white canvas with two barely-perceptible washes — sky cyan up
+     top, seafoam lower down — echoing the halftone map's spectrum without
+     literally building it. Kept faint so it reads as air, not color. */
+  background-image:
+    radial-gradient(ellipse 70% 40% at 78% -4%, rgba(136, 222, 235, 0.16), transparent 60%),
+    radial-gradient(ellipse 60% 34% at 6% 46%, rgba(68, 180, 139, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 30% at 92% 70%, rgba(30, 65, 153, 0.05), transparent 60%);
+  background-attachment: fixed;
+  color: #111a4a;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(17, 26, 74, 0.14);
+  color: #111a4a;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid rgba(17, 26, 74, 0.45);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.section-anchor {
+  scroll-margin-top: 92px;
+}
+
+/* Wide-screen story rail. Its fill is tied directly to document scroll. */
+.execution-rail {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  z-index: 40;
+  display: none;
+  height: 320px;
+  width: 84px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.execution-rail__track {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  top: 5px;
+  width: 1px;
+  background: rgba(17, 26, 74, 0.12);
+}
+
+.execution-rail__progress {
+  position: absolute;
+  inset: 0;
+  background: #ec652b;
+  transform: scaleY(0);
+  transform-origin: top;
+  animation: execution-progress linear both;
+  animation-timeline: scroll(root block);
+}
+
+.execution-rail__labels {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 0 0 13px;
+  padding: 0;
+  list-style: none;
+}
+
+.execution-rail__labels li {
+  display: grid;
+  gap: 2px;
+  color: #7c7f88;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.execution-rail__labels li span {
+  color: #a9acb6;
+  font-size: 8px;
+}
+
+@keyframes execution-progress {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@media (min-width: 1536px) {
+  .execution-rail {
+    display: block;
+    left: max(24px, calc((100vw - 88rem) / 2 - 5.5rem));
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  .execution-rail__progress {
+    opacity: 0.25;
+    transform: scaleY(1);
+  }
+}
+
+/* Keep native project view transitions scoped to the expanding case file. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-group(project-0),
+::view-transition-group(project-1),
+::view-transition-group(project-2),
+::view-transition-group(project-3) {
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Native <details> chevron off — Experience section draws its own. */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .execution-rail__progress {
+    animation: none;
+    opacity: 0.35;
+    transform: scaleY(0.25);
+  }
+}
