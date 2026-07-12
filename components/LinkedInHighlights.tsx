@@ -25,6 +25,7 @@ const outsidePerspective =
 
 export function LinkedInHighlights() {
   const sectionRef = useRef<HTMLElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
   const [desktop, setDesktop] = useState(false);
   const [activePost, setActivePost] = useState(0);
@@ -43,6 +44,15 @@ export function LinkedInHighlights() {
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
   }, []);
+
+  const scrollToPost = (index: number) => {
+    const carousel = carouselRef.current;
+    const card = cardRefs.current[index];
+    if (!carousel || !card) return;
+    const left = card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2;
+    carousel.scrollTo({ left, behavior: reduced ? "auto" : "smooth" });
+    setActivePost(index);
+  };
 
   return (
     <section ref={sectionRef} id="linkedin" className="section-anchor overflow-hidden border-t border-navy/10 py-20 sm:py-28">
@@ -93,10 +103,22 @@ export function LinkedInHighlights() {
             <div className="mb-5 flex items-center justify-between sm:hidden">
               <span className="font-mono text-[10px] uppercase tracking-[.12em] text-steel">Document {String(activePost + 1).padStart(2, "0")} / 02</span>
               <div className="flex gap-2">
-                {linkedInPosts.map((post, index) => <button key={post.src} type="button" aria-label={`Show LinkedIn post ${index + 1}`} onClick={() => cardRefs.current[index]?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest", inline: "center" })} className={`h-1.5 rounded-full transition-all ${activePost === index ? "w-8 bg-navy" : "w-3 bg-navy/20"}`} />)}
+                {linkedInPosts.map((post, index) => <button key={post.src} type="button" aria-label={`Show LinkedIn post ${index + 1}`} onClick={() => scrollToPost(index)} className={`h-1.5 rounded-full transition-all ${activePost === index ? "w-8 bg-navy" : "w-3 bg-navy/20"}`} />)}
               </div>
             </div>
-            <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-10 sm:-mx-8 sm:gap-5 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
+            <div ref={carouselRef} onScroll={(event) => {
+              if (desktop) return;
+              const carousel = event.currentTarget;
+              const center = carousel.scrollLeft + carousel.clientWidth / 2;
+              const cards = Array.from(carousel.children) as HTMLElement[];
+              let closest = 0;
+              cards.forEach((card, index) => {
+                const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                const currentCenter = cards[closest].offsetLeft + cards[closest].offsetWidth / 2;
+                if (Math.abs(cardCenter - center) < Math.abs(currentCenter - center)) closest = index;
+              });
+              setActivePost(closest);
+            }} className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-10 sm:-mx-8 sm:gap-5 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
             {linkedInPosts.map((post, index) => (
               <motion.article
                 key={post.src}
@@ -104,7 +126,6 @@ export function LinkedInHighlights() {
                 style={{ y: reduced || !desktop ? 0 : index === 0 ? firstY : secondY }}
                 initial={false}
                 whileInView={{ opacity: 1 }}
-                onViewportEnter={() => setActivePost(index)}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.6, delay: reduced ? 0 : index * 0.1, ease: "easeOut" }}
                 className={`relative w-[88vw] max-w-[31.5rem] shrink-0 snap-center before:absolute before:inset-2 before:-z-10 before:translate-x-2 before:translate-y-2 before:rounded-lg before:border before:border-line before:bg-white/60 sm:w-[72vw] lg:w-auto lg:max-w-none ${

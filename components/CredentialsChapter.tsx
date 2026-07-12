@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Plus } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, FileText, Plus } from "lucide-react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { experiences, skillGroups } from "@/data/site";
 
@@ -47,6 +48,27 @@ export function CredentialsChapter() {
               ))}
             </div>
           </aside>
+        </div>
+
+        <div className="mt-16 border-t border-line pt-8">
+          <div className="mb-5 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[.12em] text-navy"><span className="h-1.5 w-1.5 rounded-full bg-signal" aria-hidden="true" />Professional certificate</div>
+          <article className="grid overflow-hidden rounded-xl border border-line bg-white shadow-elevated lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,.75fr)]">
+            <a href="/certificates/google-ai-professional-certificate.pdf" target="_blank" rel="noreferrer" className="group relative aspect-[22/17] overflow-hidden bg-[#eef3f8]">
+              <Image src="/certificates/google-ai-professional-certificate.webp" alt="Google AI Professional Certificate awarded to Awad M Buisir" fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-contain transition-transform duration-500 group-hover:scale-[1.015]" />
+              <span className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/85 text-navy shadow-card backdrop-blur" aria-hidden="true"><ArrowUpRight className="h-4 w-4" /></span>
+            </a>
+            <div className="flex flex-col justify-between p-6 sm:p-8">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[.12em] text-seafoam-700">Google / Coursera · Jul 12, 2026</p>
+                <h3 className="mt-4 font-display text-3xl font-medium leading-tight tracking-[-.03em] text-navy">Google AI Professional Certificate</h3>
+                <p className="mt-4 text-[15px] leading-7 text-slate">Seven-course professional program covering AI-assisted research, communication, content creation, data analysis, app building, and responsible prompting.</p>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="/certificates/google-ai-professional-certificate.pdf" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-navy px-5 font-mono text-[10px] uppercase tracking-[.1em] text-white"><FileText className="h-4 w-4" aria-hidden="true" />View certificate</a>
+                <a href="https://coursera.org/verify/professional-cert/C1A1H99S1YFE" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line px-5 font-mono text-[10px] uppercase tracking-[.1em] text-navy">Verify credential<ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /></a>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
