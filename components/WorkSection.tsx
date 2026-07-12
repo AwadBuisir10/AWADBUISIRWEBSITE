@@ -65,7 +65,7 @@ function ProjectPreview({ project }: { project: Project }) {
       <div className="relative aspect-[4/3] overflow-hidden bg-[#091f2b]">
         {project.media ? (
           isVideo(project.media) ? (
-            <video src={project.media} controls playsInline preload="metadata" className="h-full w-full object-cover" />
+            <video src={project.media} poster={project.poster} controls playsInline preload="metadata" className="h-full w-full object-cover" />
           ) : (
             <Image src={project.media} alt={`${project.title} demo`} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
           )

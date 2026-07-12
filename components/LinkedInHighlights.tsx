@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, Linkedin } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Linkedin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 
@@ -49,7 +49,8 @@ export function LinkedInHighlights() {
     const carousel = carouselRef.current;
     const card = cardRefs.current[index];
     if (!carousel || !card) return;
-    const left = card.offsetLeft - (carousel.clientWidth - card.offsetWidth) / 2;
+    const firstCard = cardRefs.current[0];
+    const left = index * ((firstCard?.offsetWidth ?? card.offsetWidth) + 16);
     carousel.scrollTo({ left, behavior: reduced ? "auto" : "smooth" });
     setActivePost(index);
   };
@@ -64,18 +65,18 @@ export function LinkedInHighlights() {
           note="Launches, community milestones, and outside perspective."
         />
 
-        <div className="mt-12 grid items-start gap-12 lg:grid-cols-[16rem_1fr] lg:gap-16">
+        <div className="mt-12 grid min-w-0 items-start gap-12 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
           <motion.aside
             initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: "easeOut" }}
-            className="lg:sticky lg:top-28"
+            className="min-w-0 lg:sticky lg:top-28"
           >
-            <p className="font-display text-xl font-medium leading-8 text-navy">
+            <p className="max-w-full font-display text-xl font-medium leading-8 text-navy">
               Public notes from the work, not a second resume.
             </p>
-            <p className="mt-3 text-[15px] leading-7 text-slate">
+            <p className="mt-3 max-w-full text-[15px] leading-7 text-slate">
               These posts document LibyanClub's growth and the people who saw it happen.
             </p>
 
@@ -99,11 +100,12 @@ export function LinkedInHighlights() {
             </a>
           </motion.aside>
 
-          <div>
+          <div className="min-w-0 max-w-full">
             <div className="mb-5 flex items-center justify-between sm:hidden">
               <span className="font-mono text-[10px] uppercase tracking-[.12em] text-steel">Document {String(activePost + 1).padStart(2, "0")} / 02</span>
               <div className="flex gap-2">
-                {linkedInPosts.map((post, index) => <button key={post.src} type="button" aria-label={`Show LinkedIn post ${index + 1}`} onClick={() => scrollToPost(index)} className={`h-1.5 rounded-full transition-all ${activePost === index ? "w-8 bg-navy" : "w-3 bg-navy/20"}`} />)}
+                <button type="button" aria-label="Previous LinkedIn post" onClick={() => scrollToPost((activePost - 1 + linkedInPosts.length) % linkedInPosts.length)} className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-navy shadow-card"><ArrowLeft className="h-4 w-4" aria-hidden="true" /></button>
+                <button type="button" aria-label="Next LinkedIn post" onClick={() => scrollToPost((activePost + 1) % linkedInPosts.length)} className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-navy shadow-card"><ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
               </div>
             </div>
             <div ref={carouselRef} onScroll={(event) => {
@@ -118,7 +120,7 @@ export function LinkedInHighlights() {
                 if (Math.abs(cardCenter - center) < Math.abs(currentCenter - center)) closest = index;
               });
               setActivePost(closest);
-            }} className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-10 sm:-mx-8 sm:gap-5 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
+            }} className="relative -mx-5 flex w-[calc(100%+2.5rem)] snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-10 sm:-mx-8 sm:w-[calc(100%+4rem)] sm:gap-5 sm:px-8 lg:mx-0 lg:grid lg:w-full lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
             {linkedInPosts.map((post, index) => (
               <motion.article
                 key={post.src}

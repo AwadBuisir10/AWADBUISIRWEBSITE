@@ -41,6 +41,8 @@ export type Project = {
   summary: string;
   /** Demo video (.mp4/.webm) or image under /public. Null shows a "demo coming soon" placeholder. */
   media: string | null;
+  /** Static first-paint image for video media, especially required by mobile Safari. */
+  poster?: string;
   /** Personal or process image that adds context beside the demo. */
   contextImage?: string;
   contextAlt?: string;
@@ -80,6 +82,7 @@ export const projects: Project[] = [
     summary:
       "A YOLOv8-based vision pipeline that detects and tracks every player across full match footage, keeps identities stable through occlusions, and cuts highlight clips around key moments — turning hours of raw film into shareable edits automatically.",
     media: "/demos/SoccerDemo.mp4",
+    poster: "/demos/posters/soccer-vision.jpg",
     contextImage: "/assets/personal/awad-soccer.jpg",
     contextAlt: "Awad Buisir on a soccer field wearing a red jersey",
     contextCaption: "Built by someone who plays the game",
@@ -99,6 +102,7 @@ export const projects: Project[] = [
     summary:
       "An automation loop between analytics and content. Retention and engagement data from published reels feeds an LLM pipeline that proposes the next video ideas, writes scripts, and drafts captions — so every new post is informed by what actually performed.",
     media: "/demos/DEMO.mp4",
+    poster: "/demos/posters/llm-content-engine.jpg",
     tags: ["LLMs", "Prompt Design", "Analytics"],
     disciplines: ["ai", "automation", "creative"],
     outcome: "Closes the loop between audience retention data and the next creative brief.",

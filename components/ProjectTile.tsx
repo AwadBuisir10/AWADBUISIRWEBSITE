@@ -56,7 +56,7 @@ export function ProjectTile({ project, index, active, onActivate }: { project: P
 
             {project.media ? (
               <div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-line bg-white shadow-card lg:hidden">
-                {isVideo(project.media) ? <video src={project.media} playsInline muted preload="metadata" className="h-full w-full object-cover" /> : <Image src={project.media} alt={`${project.title} preview`} fill sizes="(max-width: 1023px) 90vw" className="object-cover" />}
+                {isVideo(project.media) ? <video src={project.media} poster={project.poster} controls playsInline preload="metadata" className="h-full w-full object-cover" /> : <Image src={project.media} alt={`${project.title} preview`} fill sizes="(max-width: 1023px) 90vw" className="object-cover" />}
               </div>
             ) : null}
           </div>
