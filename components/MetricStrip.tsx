@@ -20,13 +20,19 @@ export function MetricStrip() {
             transition={{ duration: 0.5, delay: reduced ? 0 : i * 0.06, ease: "easeOut" }}
             className="border-b border-r border-line px-5 py-6 transition-colors duration-300 last:border-r-0 hover:bg-white sm:border-b-0 lg:px-6 2xl:px-8 2xl:py-8"
           >
-            <AnimatedNumber
-              value={metric.value}
-              decimals={metric.decimals}
-              prefix={metric.prefix}
-              suffix={metric.suffix}
-              className="font-display text-3xl font-semibold tracking-[-0.02em] text-seafoam-700 2xl:text-4xl"
-            />
+            {metric.label === "Cameras" ? (
+              <span className="font-display text-3xl font-semibold tracking-[-0.02em] text-seafoam-700 2xl:text-4xl">
+                1,000+
+              </span>
+            ) : (
+              <AnimatedNumber
+                value={metric.value}
+                decimals={metric.decimals}
+                prefix={metric.prefix}
+                suffix={metric.suffix}
+                className="font-display text-3xl font-semibold tracking-[-0.02em] text-seafoam-700 2xl:text-4xl"
+              />
+            )}
             <p className="mt-2 font-mono text-[13px] uppercase tracking-[0.1em] text-slate">
               {metric.label}
             </p>
