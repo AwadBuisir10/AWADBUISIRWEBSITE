@@ -91,11 +91,11 @@ export function ReelCarousel() {
           onClickCapture={swallowDragClicks}
         >
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-gradient-to-r from-canvas to-transparent sm:w-24"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-3 bg-gradient-to-r from-canvas/70 to-transparent sm:w-24 sm:from-canvas"
             aria-hidden="true"
           />
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-gradient-to-l from-canvas to-transparent sm:w-24"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-3 bg-gradient-to-l from-canvas/70 to-transparent sm:w-24 sm:from-canvas"
             aria-hidden="true"
           />
 
@@ -127,7 +127,7 @@ export function ReelCarousel() {
 
 function ReelCard({ reel, className = "" }: { reel: Reel; className?: string }) {
   return (
-    <article className={`w-[76vw] max-w-[330px] shrink-0 sm:w-[330px] ${className}`}>
+    <article className={`w-[72vw] max-w-[330px] shrink-0 sm:w-[330px] ${className}`}>
       <a
         href={reel.url}
         target="_blank"

@@ -78,7 +78,7 @@ export function LinkedInHighlights() {
             </a>
           </motion.aside>
 
-          <div className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-10 sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
+          <div className="grid grid-cols-1 gap-10 pb-4 sm:-mx-8 sm:flex sm:snap-x sm:snap-mandatory sm:gap-5 sm:overflow-x-auto sm:px-8 sm:pb-10 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
             {linkedInPosts.map((post, index) => (
               <motion.article
                 key={post.src}
@@ -87,7 +87,7 @@ export function LinkedInHighlights() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.6, delay: reduced ? 0 : index * 0.1, ease: "easeOut" }}
-                className={`w-[86vw] max-w-[31.5rem] shrink-0 snap-start lg:w-auto lg:max-w-none ${
+                className={`w-full min-w-0 max-w-[31.5rem] shrink-0 snap-start sm:w-[78vw] lg:w-auto lg:max-w-none ${
                   index === 1 ? "lg:mt-16" : ""
                 }`}
               >
@@ -108,7 +108,7 @@ export function LinkedInHighlights() {
                     />
                   </a>
                 </div>
-                <div className="relative aspect-[504/626] overflow-hidden rounded-lg border border-line bg-white shadow-elevated">
+                <div className="relative aspect-[504/626] w-full overflow-hidden rounded-lg border border-line bg-white shadow-elevated">
                   <iframe
                     src={post.src}
                     title={post.title}

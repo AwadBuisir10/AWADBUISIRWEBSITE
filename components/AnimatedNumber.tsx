@@ -31,7 +31,10 @@ export function AnimatedNumber({
 
   useEffect(() => {
     if (!inView) return;
-    if (reduced) {
+    // On narrow screens the metric strip can enter the viewport while Safari is
+    // still settling the page. Showing the final value immediately avoids a
+    // half-painted count such as "0+" lingering on screen.
+    if (reduced || window.matchMedia("(max-width: 639px)").matches) {
       count.set(value);
       return;
     }

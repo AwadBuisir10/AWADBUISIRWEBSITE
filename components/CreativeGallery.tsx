@@ -114,9 +114,13 @@ export function CreativeGallery() {
 
         <div className="mt-20 overflow-hidden rounded-xl bg-[#f0eadb] text-navy">
           <div className="grid lg:grid-cols-2">
-            <div className="grid grid-cols-2 gap-px bg-navy/10 p-px">
-              <img src="/assets/ai-creative/libya-kit-design.png" alt="Front and back design of an AI-assisted Libya basketball uniform concept" loading="lazy" className="h-full min-h-[26rem] w-full bg-[#f0eadb] object-cover" />
-              <img src="/assets/ai-creative/libya-kit-concept.png" alt="AI visualization of the Libya basketball jersey concept in use" loading="lazy" className="h-full min-h-[26rem] w-full bg-[#f0eadb] object-cover" />
+            <div className="grid grid-cols-1 gap-px bg-navy/10 p-px sm:grid-cols-2">
+              <div className="flex aspect-[4/3] items-center justify-center overflow-hidden bg-[#f0eadb] p-3 sm:aspect-auto sm:min-h-[26rem] sm:p-0">
+                <img src="/assets/ai-creative/libya-kit-design.png" alt="Front and back design of an AI-assisted Libya basketball uniform concept" loading="lazy" className="h-full w-full object-contain sm:object-cover" />
+              </div>
+              <div className="flex aspect-[4/3] items-center justify-center overflow-hidden bg-[#f0eadb] sm:aspect-auto sm:min-h-[26rem]">
+                <img src="/assets/ai-creative/libya-kit-concept.png" alt="AI visualization of the Libya basketball jersey concept in use" loading="lazy" className="h-full w-full object-contain sm:object-cover" />
+              </div>
             </div>
             <div className="flex flex-col justify-between p-7 sm:p-10 lg:p-12">
               <div>
