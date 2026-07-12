@@ -1,8 +1,3 @@
-"use client";
-
-import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
-
 type AnimatedNumberProps = {
   value: number;
   decimals?: number;
@@ -11,7 +6,11 @@ type AnimatedNumberProps = {
   className?: string;
 };
 
-/** Counts up when scrolled into view; re-animates if `value` changes (live data). */
+/**
+ * Metrics are intentionally rendered at their final value in server HTML.
+ * Motion belongs around the evidence, not inside the evidence itself: this
+ * keeps numbers correct before hydration, under reduced motion, and on Safari.
+ */
 export function AnimatedNumber({
   value,
   decimals = 0,
@@ -19,32 +18,7 @@ export function AnimatedNumber({
   suffix = "",
   className
 }: AnimatedNumberProps) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const reduced = useReducedMotion();
-  const count = useMotionValue(0);
-  const display = useTransform(count, (latest) => {
-    const text =
-      decimals > 0 ? latest.toFixed(decimals) : Math.round(latest).toLocaleString("en-US");
-    return `${prefix}${text}${suffix}`;
-  });
+  const text = decimals > 0 ? value.toFixed(decimals) : Math.round(value).toLocaleString("en-US");
 
-  useEffect(() => {
-    if (!inView) return;
-    // On narrow screens the metric strip can enter the viewport while Safari is
-    // still settling the page. Showing the final value immediately avoids a
-    // half-painted count such as "0+" lingering on screen.
-    if (reduced || window.matchMedia("(max-width: 639px)").matches) {
-      count.set(value);
-      return;
-    }
-    const controls = animate(count, value, { duration: 1.4, ease: [0.16, 1, 0.3, 1] });
-    return () => controls.stop();
-  }, [count, inView, reduced, value]);
-
-  return (
-    <motion.span ref={ref} className={className}>
-      {display}
-    </motion.span>
-  );
+  return <span className={className}>{prefix}{text}{suffix}</span>;
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Linkedin } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 
 const linkedInPosts = [
@@ -25,6 +25,9 @@ const outsidePerspective =
 
 export function LinkedInHighlights() {
   const sectionRef = useRef<HTMLElement>(null);
+  const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const [desktop, setDesktop] = useState(false);
+  const [activePost, setActivePost] = useState(0);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -33,8 +36,16 @@ export function LinkedInHighlights() {
   const firstY = useTransform(scrollYProgress, [0, 1], [24, -20]);
   const secondY = useTransform(scrollYProgress, [0, 1], [52, -28]);
 
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const update = () => setDesktop(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
   return (
-    <section ref={sectionRef} id="linkedin" className="section-anchor overflow-hidden py-24 sm:py-28">
+    <section ref={sectionRef} id="linkedin" className="section-anchor overflow-hidden border-t border-navy/10 py-20 sm:py-28">
       <div className="mx-auto max-w-shell px-5 sm:px-8">
         <SectionHeader
           index="04"
@@ -45,7 +56,7 @@ export function LinkedInHighlights() {
 
         <div className="mt-12 grid items-start gap-12 lg:grid-cols-[16rem_1fr] lg:gap-16">
           <motion.aside
-            initial={reduced ? false : { opacity: 0, y: 16 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: "easeOut" }}
@@ -78,16 +89,25 @@ export function LinkedInHighlights() {
             </a>
           </motion.aside>
 
-          <div className="grid grid-cols-1 gap-10 pb-4 sm:-mx-8 sm:flex sm:snap-x sm:snap-mandatory sm:gap-5 sm:overflow-x-auto sm:px-8 sm:pb-10 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
+          <div>
+            <div className="mb-5 flex items-center justify-between sm:hidden">
+              <span className="font-mono text-[10px] uppercase tracking-[.12em] text-steel">Document {String(activePost + 1).padStart(2, "0")} / 02</span>
+              <div className="flex gap-2">
+                {linkedInPosts.map((post, index) => <button key={post.src} type="button" aria-label={`Show LinkedIn post ${index + 1}`} onClick={() => cardRefs.current[index]?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest", inline: "center" })} className={`h-1.5 rounded-full transition-all ${activePost === index ? "w-8 bg-navy" : "w-3 bg-navy/20"}`} />)}
+              </div>
+            </div>
+            <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-10 sm:-mx-8 sm:gap-5 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-7 lg:overflow-visible lg:px-0 lg:pb-0">
             {linkedInPosts.map((post, index) => (
               <motion.article
                 key={post.src}
-                style={{ y: reduced ? 0 : index === 0 ? firstY : secondY }}
-                initial={reduced ? false : { opacity: 0 }}
+                ref={(node) => { cardRefs.current[index] = node; }}
+                style={{ y: reduced || !desktop ? 0 : index === 0 ? firstY : secondY }}
+                initial={false}
                 whileInView={{ opacity: 1 }}
+                onViewportEnter={() => setActivePost(index)}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.6, delay: reduced ? 0 : index * 0.1, ease: "easeOut" }}
-                className={`w-full min-w-0 max-w-[31.5rem] shrink-0 snap-start sm:w-[78vw] lg:w-auto lg:max-w-none ${
+                className={`relative w-[88vw] max-w-[31.5rem] shrink-0 snap-center before:absolute before:inset-2 before:-z-10 before:translate-x-2 before:translate-y-2 before:rounded-lg before:border before:border-line before:bg-white/60 sm:w-[72vw] lg:w-auto lg:max-w-none ${
                   index === 1 ? "lg:mt-16" : ""
                 }`}
               >
@@ -109,21 +129,25 @@ export function LinkedInHighlights() {
                   </a>
                 </div>
                 <div className="relative aspect-[504/626] w-full overflow-hidden rounded-lg border border-line bg-white shadow-elevated">
-                  <iframe
-                    src={post.src}
-                    title={post.title}
-                    width="504"
-                    height="626"
-                    loading="lazy"
-                    allowFullScreen
-                    className="absolute inset-0 h-full w-full border-0 bg-white"
-                  />
+                  <DeferredLinkedInEmbed src={post.src} title={post.title} />
                 </div>
               </motion.article>
             ))}
+            </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function DeferredLinkedInEmbed({ src, title }: { src: string; title: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const nearViewport = useInView(ref, { once: true, margin: "300px" });
+
+  return (
+    <div ref={ref} className="absolute inset-0">
+      {nearViewport ? <iframe src={src} title={title} width="504" height="626" loading="lazy" allowFullScreen className="h-full w-full border-0 bg-white" /> : <div className="flex h-full items-center justify-center bg-white font-mono text-[10px] uppercase tracking-[.12em] text-steel">LinkedIn document</div>}
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { Menu, X } from "lucide-react";
 import { navItems } from "@/data/site";
 import { contact } from "@/data/site";
@@ -10,6 +10,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const ids = navItems.map((item) => item.href.replace("#", ""));
@@ -32,6 +33,22 @@ export function Navbar() {
       window.removeEventListener("resize", onScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", close);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", close);
+    };
+  }, [open]);
 
   const handleAnchorClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith("#")) return;
@@ -97,9 +114,11 @@ export function Navbar() {
         </div>
 
         <button
+          ref={menuButtonRef}
           type="button"
           aria-label={open ? "Close navigation" : "Open navigation"}
           aria-expanded={open}
+          aria-controls="mobile-navigation"
           onClick={() => setOpen((value) => !value)}
           className="flex h-11 w-11 items-center justify-center rounded-full text-navy transition-colors duration-150 hover:bg-black/[0.04] lg:hidden"
         >
@@ -108,30 +127,34 @@ export function Navbar() {
       </nav>
 
       <div
+        id="mobile-navigation"
+        aria-hidden={!open}
+        inert={!open}
         className={cn(
-          "grid bg-white px-5 transition-[grid-template-rows] duration-300 lg:hidden",
-          open ? "grid-rows-[1fr] border-t border-line" : "grid-rows-[0fr]"
+          "absolute inset-x-0 top-full grid bg-white px-5 transition-[grid-template-rows,opacity] duration-300 lg:hidden",
+          open ? "h-[calc(100svh-4rem)] grid-rows-[1fr] border-t border-line opacity-100" : "grid-rows-[0fr] opacity-0"
         )}
       >
         <div className="overflow-hidden">
           <div className="flex flex-col py-4">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={(event) => handleAnchorClick(event, item.href)}
                 className={cn(
-                  "border-b border-line py-4 font-display text-2xl font-medium",
+                  "grid grid-cols-[2.5rem_1fr] items-center border-b border-line py-4 font-display text-2xl font-medium",
                   activeSection === item.href.replace("#", "") ? "text-navy" : "text-slate"
                 )}
               >
-                {item.label}
+                <span className="font-mono text-[10px] text-fog">{String(index + 1).padStart(2, "0")}</span>
+                <span>{item.label}</span>
               </a>
             ))}
             <a
               href={contact.resume}
               download
-              className="py-4 font-mono text-[13px] uppercase tracking-[0.1em] text-steel"
+              className="mt-auto py-5 font-mono text-[13px] uppercase tracking-[0.1em] text-steel"
             >
               Download Resume ↓
             </a>

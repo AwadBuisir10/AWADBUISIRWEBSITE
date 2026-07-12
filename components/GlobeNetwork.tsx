@@ -400,7 +400,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
         const node = nodeRefs.current[city.name];
 
         if (node) {
-          const nodeVisible = point.z > 0.08 && width >= 460;
+          const nodeVisible = point.z > 0.08 && width >= 320;
           node.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
           node.style.opacity = nodeVisible
             ? String(Math.max(0.35, smooth((point.z + 0.02) / 0.3)))
@@ -503,7 +503,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
         className="pointer-events-none h-full w-full select-none font-mono"
       />
 
-      <div className="absolute inset-0 hidden lg:block">
+      <div className="absolute inset-0">
         {cities.map((city) => {
           const primaryNode =
             city.marker === "origin" || city.marker === "work" || city.marker === "purpose";
@@ -523,7 +523,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
               onFocus={() => setActiveCityName(city.name)}
               onBlur={() => setActiveCityName(home.name)}
               aria-label={`${city.name}: ${city.story.title}`}
-              className={`group absolute left-0 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-full opacity-0 transition-[opacity,border-color,background-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 ${
+              className={`group absolute left-0 top-0 z-20 h-8 w-8 items-center justify-center rounded-full opacity-0 transition-[opacity,border-color,background-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 ${primaryNode ? "flex" : "hidden lg:flex"} ${
                 primaryNode
                   ? "border border-navy/20 bg-white/90 shadow-card"
                   : active

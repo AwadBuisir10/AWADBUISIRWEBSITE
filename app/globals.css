@@ -7,8 +7,8 @@
 
   /* Core text/border tokens (mirrored in tailwind.config.ts). */
   --text: #111a4a;
-  --muted-text: #7c7f88;
-  --dim-text: #a9acb6;
+  --muted-text: #666b75;
+  --dim-text: #737783;
   --border: #e3e4e8;
 }
 
@@ -38,6 +38,49 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-180%);
+  border-radius: 0.5rem;
+  background: #111a4a;
+  padding: 0.75rem 1rem;
+  color: white;
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.chapter-map {
+  position: relative;
+  overflow: clip;
+  background-color: #f8f9fa;
+  background-image:
+    linear-gradient(rgba(17, 26, 74, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 26, 74, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 80% 15%, rgba(136, 222, 235, 0.11), transparent 30%);
+  background-size: 64px 64px, 64px 64px, auto;
+}
+
+.chapter-reach {
+  position: relative;
+  overflow: clip;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(68, 180, 139, 0.16), transparent 28%),
+    radial-gradient(circle at 88% 68%, rgba(30, 65, 153, 0.08), transparent 32%),
+    #edf2ee;
+}
+
+.chapter-credentials {
+  background: #fffdf8;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
 ::selection {
   background: rgba(17, 26, 74, 0.14);
   color: #111a4a;
@@ -65,6 +108,33 @@ summary:focus-visible {
   scroll-margin-top: 92px;
 }
 
+.route-mobile {
+  position: fixed;
+  inset: 4rem 0 auto;
+  z-index: 49;
+  height: 2px;
+  background: rgba(17, 26, 74, 0.1);
+}
+
+.route-mobile__fill {
+  position: absolute;
+  inset: 0;
+  background: #44b48b;
+  transform-origin: left;
+  transition: transform 100ms linear;
+}
+
+.route-mobile__label {
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  color: #7c7f88;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 /* Wide-screen story rail. Its fill is tied directly to document scroll. */
 .execution-rail {
   position: fixed;
@@ -74,7 +144,7 @@ summary:focus-visible {
   display: none;
   height: 320px;
   width: 84px;
-  pointer-events: none;
+  pointer-events: auto;
   transform: translateY(-50%);
 }
 
@@ -93,8 +163,7 @@ summary:focus-visible {
   background: #ec652b;
   transform: scaleY(0);
   transform-origin: top;
-  animation: execution-progress linear both;
-  animation-timeline: scroll(root block);
+  transition: transform 100ms linear;
 }
 
 .execution-rail__labels {
@@ -107,7 +176,8 @@ summary:focus-visible {
   list-style: none;
 }
 
-.execution-rail__labels li {
+.execution-rail__labels li a {
+  position: relative;
   display: grid;
   gap: 2px;
   color: #7c7f88;
@@ -123,10 +193,27 @@ summary:focus-visible {
   font-size: 8px;
 }
 
-@keyframes execution-progress {
-  to {
-    transform: scaleY(1);
-  }
+.execution-rail__labels li a::before {
+  position: absolute;
+  left: -17px;
+  margin-top: 3px;
+  height: 7px;
+  width: 7px;
+  border: 1px solid rgba(17, 26, 74, 0.2);
+  border-radius: 999px;
+  background: #f8f9fa;
+  content: "";
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.execution-rail__labels li.is-active a {
+  color: #111a4a;
+}
+
+.execution-rail__labels li.is-active a::before {
+  border-color: #ec652b;
+  background: #ec652b;
+  transform: scale(1.25);
 }
 
 @media (min-width: 1536px) {
@@ -134,12 +221,22 @@ summary:focus-visible {
     display: block;
     left: max(24px, calc((100vw - 88rem) / 2 - 5.5rem));
   }
+
+  .route-mobile {
+    display: none;
+  }
 }
 
 @supports not (animation-timeline: scroll()) {
   .execution-rail__progress {
     opacity: 0.25;
     transform: scaleY(1);
+  }
+}
+
+@media (max-width: 639px) {
+  body {
+    background-attachment: scroll;
   }
 }
 

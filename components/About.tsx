@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import { useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { about } from "@/data/site";
@@ -11,14 +12,14 @@ export function About() {
   const activePillar = about.pillars[activeIndex];
 
   return (
-    <section id="about" className="section-anchor py-24 sm:py-28">
+    <section id="about" className="section-anchor py-20 sm:py-28">
       <div className="mx-auto max-w-shell px-5 sm:px-8">
         <SectionHeader index="01" eyebrow="About" />
 
         <div className="mt-10 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
           <div>
             <motion.p
-              initial={reduced ? false : { opacity: 0, y: 18 }}
+              initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, ease: "easeOut" }}
@@ -28,19 +29,20 @@ export function About() {
               <span className="text-steel">{about.lines[1]}</span>
             </motion.p>
 
-            <div className="mt-10 grid max-w-xl grid-cols-[5rem_1fr] items-start gap-5 sm:grid-cols-[6rem_1fr] sm:gap-6">
+            <div className="mt-10 grid max-w-xl grid-cols-[8rem_1fr] items-start gap-5 sm:grid-cols-[9rem_1fr] sm:gap-7">
               <motion.figure
-                initial={reduced ? false : { opacity: 0, y: 12 }}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               >
-                <div className="aspect-[3/4] overflow-hidden rounded-md border border-line bg-canvas shadow-card">
-                  <img
+                <div className="relative aspect-[3/4] overflow-hidden rounded-md border border-line bg-canvas shadow-card">
+                  <Image
                     src="/assets/personal/awad-headshot.jpg"
                     alt="Portrait of Awad Buisir"
-                    loading="lazy"
-                    className="h-full w-full object-cover object-top"
+                    fill
+                    sizes="(max-width: 639px) 128px, 144px"
+                    className="object-cover object-top"
                   />
                 </div>
                 <figcaption className="mt-2 font-mono text-[9px] uppercase tracking-[0.08em] text-steel">
@@ -81,7 +83,7 @@ export function About() {
                 onMouseEnter={() => setActiveIndex(i)}
                 onFocus={() => setActiveIndex(i)}
                 onClick={() => setActiveIndex(i)}
-                initial={reduced ? false : { opacity: 0, y: 14 }}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0 }}
                 whileHover={reduced ? undefined : { x: 4 }}
                 viewport={{ once: true, margin: "-60px" }}

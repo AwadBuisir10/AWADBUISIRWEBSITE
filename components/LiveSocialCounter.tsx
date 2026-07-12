@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { FALLBACK_SOCIAL_COUNTS } from "@/data/socialLinks";
 
 type SocialCount = {
@@ -54,11 +53,9 @@ export function LiveSocialCounter() {
       </p>
 
       <p className="mt-4">
-        <AnimatedNumber
-          value={count.totalFollowers}
-          suffix={count.live ? "" : "+"}
-          className="font-display text-6xl font-semibold tracking-[-0.03em] text-navy sm:text-7xl"
-        />
+        <span className="font-display text-6xl font-semibold tracking-[-0.03em] text-navy sm:text-7xl">
+          {count.totalFollowers.toLocaleString("en-US")}{count.live ? "" : "+"}
+        </span>
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-1 font-mono text-[13px] uppercase tracking-[0.1em] text-slate">

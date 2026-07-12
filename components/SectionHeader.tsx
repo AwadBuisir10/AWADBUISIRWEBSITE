@@ -16,7 +16,7 @@ export function SectionHeader({ index, eyebrow, title, note, dark = false }: Sec
 
   return (
     <motion.div
-      initial={reduced ? false : { opacity: 0, y: 18 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.55, ease: "easeOut" }}
@@ -24,7 +24,7 @@ export function SectionHeader({ index, eyebrow, title, note, dark = false }: Sec
     >
       <motion.span
         aria-hidden="true"
-        initial={reduced ? false : { scaleX: 0 }}
+        initial={false}
         whileInView={{ scaleX: 1 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7, ease: "easeOut" }}
@@ -44,6 +44,9 @@ export function SectionHeader({ index, eyebrow, title, note, dark = false }: Sec
         <h2 className={`mt-6 max-w-4xl font-display text-4xl font-semibold tracking-[-0.02em] sm:text-5xl 2xl:text-[3.5rem] ${dark ? "text-white" : "text-navy"}`}>
           {title}
         </h2>
+      ) : <h2 className="sr-only">{eyebrow}</h2>}
+      {note ? (
+        <p className={`mt-4 max-w-md text-sm leading-6 sm:hidden ${dark ? "text-white/55" : "text-slate"}`}>{note}</p>
       ) : null}
     </motion.div>
   );
