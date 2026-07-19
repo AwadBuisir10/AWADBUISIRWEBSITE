@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ProjectTile } from "@/components/ProjectTile";
@@ -24,12 +24,12 @@ export function WorkSection() {
   return (
     <section id="work" className="section-anchor py-20 sm:py-28">
       <div className="mx-auto max-w-shell px-5 sm:px-8">
-        <SectionHeader index="02" eyebrow="Work" title="Selected Projects" note="Explore by system type." />
+        <SectionHeader index="02" eyebrow="Work" title="Selected Projects" note="Five production-minded builds. Filter by system type." />
 
         <div className="mt-8 grid gap-5 border-y border-line py-5 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-8">
           <div role="group" aria-label="Filter projects by system type" className="grid max-w-full grid-cols-2 gap-1 rounded-lg border border-line bg-white p-1 shadow-card sm:flex sm:overflow-x-auto">
             {projectFocusOptions.map((option) => (
-              <button key={option.value} type="button" aria-pressed={focus === option.value} onClick={() => setFocus(option.value)} className={cn("min-h-10 shrink-0 rounded-md px-4 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors duration-200", focus === option.value ? "bg-navy text-white shadow-button" : "text-steel hover:bg-canvas hover:text-navy")}>
+              <button key={option.value} type="button" aria-pressed={focus === option.value} onClick={() => setFocus(option.value)} className={cn("min-h-11 shrink-0 rounded-md px-4 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors duration-200", focus === option.value ? "bg-navy text-white shadow-button" : "text-steel hover:bg-canvas hover:text-navy")}>
                 {option.label}
               </button>
             ))}
@@ -38,6 +38,7 @@ export function WorkSection() {
             <p className="text-sm leading-6 text-slate">{activeFocus.summary}</p>
             <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-seafoam-700">{activeFocus.signals.join(" · ")}</p>
           </motion.div>
+          <p className="sr-only" aria-live="polite">Showing {visibleProjects.length} {visibleProjects.length === 1 ? "project" : "projects"}.</p>
         </div>
 
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(22rem,.82fr)_minmax(0,1.18fr)] xl:gap-16">
@@ -60,19 +61,21 @@ export function WorkSection() {
 }
 
 function ProjectPreview({ project }: { project: Project }) {
+  const reduced = useReducedMotion();
+
   return (
-    <motion.figure initial={false} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .28, ease: "easeOut" }} className="overflow-hidden rounded-xl border border-line bg-white shadow-elevated">
+    <motion.figure initial={false} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduced ? undefined : { opacity: 0, y: -8 }} transition={{ duration: reduced ? 0 : .28, ease: "easeOut" }} className="overflow-hidden rounded-xl border border-line bg-white shadow-elevated">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#091f2b]">
         {project.media ? (
           isVideo(project.media) ? (
-            <video src={project.media} poster={project.poster} controls playsInline preload="metadata" className="h-full w-full object-cover" />
+            <video src={project.media} poster={project.poster} controls playsInline preload="metadata" aria-label={`${project.title} visual demo`} className="h-full w-full object-cover" />
           ) : (
             <Image src={project.media} alt={`${project.title} demo`} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
           )
         ) : (
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_45%,rgba(136,222,235,.2),transparent_32%),linear-gradient(135deg,#071b25,#102f3b)]">
             <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(148,239,183,.15)_1px,transparent_1px),linear-gradient(90deg,rgba(148,239,183,.15)_1px,transparent_1px)] [background-size:32px_32px]" />
-            <span className="relative rounded-full border border-seafoam-400/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[.14em] text-seafoam-400">System architecture / private demo</span>
+            <span className="relative rounded-full border border-seafoam-400/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[.14em] text-seafoam-400">Private build — demo on request</span>
           </div>
         )}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between p-4 font-mono text-[9px] uppercase tracking-[.12em] text-white/65">
@@ -84,7 +87,7 @@ function ProjectPreview({ project }: { project: Project }) {
           <p className="font-display text-xl font-medium text-navy">{project.title}</p>
           <p className="mt-1 text-sm leading-6 text-slate">{project.outcome}</p>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-[.12em] text-seafoam-700">Active case file</span>
+        <span className="text-right font-mono text-[9px] uppercase leading-5 tracking-[.12em] text-seafoam-700">Active case file<br /><span className="text-steel">{project.proof}</span></span>
       </figcaption>
     </motion.figure>
   );
