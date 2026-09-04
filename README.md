@@ -41,3 +41,15 @@ FB_PAGE_ID=979893621873299   # LibyanClub Facebook Page id
 ```
 
 Tokens stay server-side; the frontend only ever sees the JSON counts.
+
+Set these same variables in the Vercel project's **Production** environment
+and redeploy. Local `.env.local` values are not automatically deployed.
+Use a valid Meta token authorized for the configured accounts; never put it
+in a `NEXT_PUBLIC_` variable or commit it to Git.
+
+Check `/api/social-count` after deployment: `sources.instagram` and
+`sources.facebook` must both say `live` for the combined total to be live.
+`snapshot` means the upstream request failed or credentials are absent.
+The UI labels saved counts explicitly and retries every minute. Failed or
+partial results are not cached by the CDN; successful results cache for an hour.
+Facebook likes are not used as a substitute for follower counts.

@@ -32,6 +32,7 @@ type SocialCount = {
   /** null while running on fallback numbers */
   lastUpdated: string | null;
   live: boolean;
+  sources: { instagram: "live" | "snapshot"; facebook: "live" | "snapshot" };
 };
 
 let cache: { data: SocialCount; fetchedAt: number } | null = null;
@@ -45,11 +46,12 @@ async function fetchInstagramFollowers(): Promise<number | null> {
     const fields = `business_discovery.username(${IG_USERNAME}){followers_count}`;
     const res = await fetch(
       `${GRAPH}/${igAccountId}?fields=${encodeURIComponent(fields)}&access_token=${token}`,
-      { cache: "no-store" }
+      { cache: "no-store", signal: AbortSignal.timeout(8000) }
     );
     if (!res.ok) return null;
     const json = await res.json();
-    return json?.business_discovery?.followers_count ?? null;
+    const count = json?.business_discovery?.followers_count;
+    return Number.isSafeInteger(count) && count >= 0 ? count : null;
   } catch {
     return null;
   }
@@ -63,20 +65,21 @@ async function fetchFacebookFollowers(): Promise<number | null> {
   try {
     const res = await fetch(
       `${GRAPH}/${pageId}?fields=followers_count,fan_count&access_token=${token}`,
-      { cache: "no-store" }
+      { cache: "no-store", signal: AbortSignal.timeout(8000) }
     );
     if (!res.ok) return null;
     const json = await res.json();
-    return json?.followers_count ?? json?.fan_count ?? null;
+    const count = json?.followers_count;
+    return Number.isSafeInteger(count) && count >= 0 ? count : null;
   } catch {
     return null;
   }
 }
 
 export async function GET() {
-  if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
+  if (cache && Date.now() - cache.fetchedAt < (cache.data.live ? CACHE_TTL_MS : 60000)) {
     return NextResponse.json(cache.data, {
-      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" }
+      headers: { "Cache-Control": cache.data.live ? "public, s-maxage=3600" : "no-store" }
     });
   }
 
@@ -85,7 +88,7 @@ export async function GET() {
     fetchFacebookFollowers()
   ]);
 
-  const live = instagram !== null || facebook !== null;
+  const live = instagram !== null && facebook !== null;
   const instagramFollowers = instagram ?? FALLBACK_SOCIAL_COUNTS.instagramFollowers;
   const facebookFollowers = facebook ?? FALLBACK_SOCIAL_COUNTS.facebookFollowers;
 
@@ -94,11 +97,12 @@ export async function GET() {
     facebookFollowers,
     totalFollowers: instagramFollowers + facebookFollowers,
     lastUpdated: live ? new Date().toISOString() : null,
-    live
+    live,
+    sources: { instagram: instagram !== null ? "live" : "snapshot", facebook: facebook !== null ? "live" : "snapshot" }
   };
 
   cache = { data, fetchedAt: Date.now() };
   return NextResponse.json(data, {
-    headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" }
+    headers: { "Cache-Control": live ? "public, s-maxage=3600" : "no-store" }
   });
 }

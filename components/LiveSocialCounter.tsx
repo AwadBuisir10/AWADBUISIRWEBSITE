@@ -9,6 +9,7 @@ type SocialCount = {
   totalFollowers: number;
   lastUpdated: string | null;
   live: boolean;
+  sources?: { instagram: "live" | "snapshot"; facebook: "live" | "snapshot" };
 };
 
 const fallback: SocialCount = {
@@ -29,16 +30,19 @@ export function LiveSocialCounter() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/social-count")
+    const refresh = () => fetch("/api/social-count", { signal: AbortSignal.timeout(12000) })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: SocialCount | null) => {
-        if (data && !cancelled) setCount(data);
+        if (data && !cancelled && Number.isSafeInteger(data.totalFollowers) && data.totalFollowers >= 0) setCount(data);
       })
       .catch(() => {
         /* keep fallback */
       });
+    refresh();
+    const interval = window.setInterval(refresh, 60000);
     return () => {
       cancelled = true;
+      window.clearInterval(interval);
     };
   }, []);
 
@@ -46,10 +50,10 @@ export function LiveSocialCounter() {
     <div>
       <p className="flex items-center gap-2.5 font-mono text-[13px] uppercase tracking-[0.12em] text-navy">
         <span className="relative flex h-2 w-2" aria-hidden="true">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-seafoam-600 opacity-60 motion-reduce:hidden" />
+          {count.live ? <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-seafoam-600 opacity-60 motion-reduce:hidden" /> : null}
           <span className="relative inline-flex h-2 w-2 rounded-full bg-seafoam-700" />
         </span>
-        Live Community Reach
+        {count.live ? "Live Community Reach" : "Community Reach"}
       </p>
 
       <p className="mt-4">
@@ -59,8 +63,8 @@ export function LiveSocialCounter() {
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-1 font-mono text-[13px] uppercase tracking-[0.1em] text-slate">
-        <span>Instagram {compact(count.instagramFollowers)}</span>
-        <span>Facebook {compact(count.facebookFollowers)}</span>
+        <a href="https://www.instagram.com/libyansclub/" target="_blank" rel="noreferrer">Instagram {compact(count.instagramFollowers)} · {count.sources?.instagram === "live" ? "live" : "saved count"}</a>
+        <a href="https://www.facebook.com/979893621873299" target="_blank" rel="noreferrer">Facebook {compact(count.facebookFollowers)} · {count.sources?.facebook === "live" ? "live" : "saved count"}</a>
         {count.lastUpdated ? (
           <span>
             Updated{" "}
@@ -71,6 +75,7 @@ export function LiveSocialCounter() {
           </span>
         ) : null}
       </div>
+      {!count.live ? <p className="mt-3 text-sm leading-6 text-slate">Live updates are temporarily unavailable for one or more profiles. Saved counts may be out of date; visit the profiles for the latest totals.</p> : null}
     </div>
   );
 }
