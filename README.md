@@ -22,34 +22,37 @@ All copy and links live in `data/`:
 | `data/projects.ts` | Selected Work rows (add `link` when a demo/repo is ready) |
 | `data/reels.ts` | Featured reel URLs, titles, view counts, and cover images (`public/assets/reels/`) |
 | `data/cities.ts` | Globe nodes and routes (Boston is `home`) |
-| `data/socialLinks.ts` | Social profiles + fallback follower counts |
+| `data/socialLinks.ts` | Social profile links |
+| `data/socialCounts.ts` | Scraped follower profiles, refresh interval, and confirmed fallback counts |
 
 The resume download lives at `public/Awad_Buisir_Resume.pdf`.
 
-## Live social counter
+## Public follower counts
 
-`GET /api/social-count` combines LibyanClub Instagram + Facebook followers via
-the official Meta Graph API and caches the result for one hour. Without
-credentials it serves the fallback numbers from `data/socialLinks.ts`.
+`GET /api/social-count` reads the public Instagram, TikTok, and Facebook profile
+pages without API credentials. TikTok uses the exact `statsV2` follower count
+when present; Instagram/Facebook use explicit follower counts in profile metadata.
+All parsers verify the profile identity. Likes, following, and post counts are ignored.
 
-To go live, create `.env.local`:
+The Next Data Cache shares results, including failed attempts, for five minutes.
+Fixed cache keys prevent query strings or each visitor from triggering scrapes.
+Concurrent requests in the same instance share one fetch. Each fetch has an
+eight-second timeout, a 2 MB body limit, and no automatic retries. HTTP 403/429
+responses trigger a warm-instance cooldown of at least 30 minutes, honoring a
+longer Retry-After. This cooldown/last-good memory resets on cold starts; the
+shared five-minute Data Cache remains the primary cross-instance throttle.
+Public platforms can still throttle or block Vercel IPs; this cannot guarantee
+uninterrupted scraping or a globally exact request limit without shared storage.
 
-```bash
-META_ACCESS_TOKEN=...        # long-lived token: instagram_basic + pages_read_engagement
-IG_BUSINESS_ACCOUNT_ID=...   # your IG professional account id (Business Discovery)
-FB_PAGE_ID=979893621873299   # LibyanClub Facebook Page id
-```
+Visible tabs poll every five minutes; hidden tabs stop polling. Revalidation is
+traffic-driven, not a background cron: idle sites do not scrape, and a stale
+cache can be returned while a refresh runs. The CDN caches responses for 30 seconds.
 
-Tokens stay server-side; the frontend only ever sees the JSON counts.
+The UI includes all three platforms and labels rounded / saved / owner-confirmed
+counts with their observation dates. `data/socialCounts.ts` contains September 4
+snapshots: Instagram ~26K, TikTok 11,965, and owner-confirmed Facebook 17,042.
+Facebook currently exposes likes, not followers, in its public metadata; it
+retains the confirmed snapshot until an explicit follower count is available.
+No login automation, proxy rotation, or anti-bot challenge bypass is used.
 
-Set these same variables in the Vercel project's **Production** environment
-and redeploy. Local `.env.local` values are not automatically deployed.
-Use a valid Meta token authorized for the configured accounts; never put it
-in a `NEXT_PUBLIC_` variable or commit it to Git.
-
-Check `/api/social-count` after deployment: `sources.instagram` and
-`sources.facebook` must both say `live` for the combined total to be live.
-`snapshot` means the upstream request failed or credentials are absent.
-The UI labels saved counts explicitly and retries every minute. Failed or
-partial results are not cached by the CDN; successful results cache for an hour.
-Facebook likes are not used as a substitute for follower counts.
+Run scraper and caching checks with `node --test tests/social-counts.test.cjs`.
