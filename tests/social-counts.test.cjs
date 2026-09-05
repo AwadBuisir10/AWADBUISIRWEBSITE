@@ -89,3 +89,29 @@ test('concurrent cold requests share one scrape per profile', async () => {
   await Promise.all([h.get(), h.get(), h.get()]);
   assert.equal(h.calls(), 3);
 });
+
+test('all client counters share a request, snapshot, and polling timer', async () => {
+  let requests = 0, timers = 0, notifications = 0;
+  const getters = [], cleanups = [];
+  const platforms = JSON.parse(JSON.stringify(data.INITIAL_SOCIAL_COUNTS));
+  platforms.tiktok.followers = 12345;
+  const store = load('lib/social-count-store.ts', {
+    '@/data/socialCounts': data,
+    react: { useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
+      cleanups.push(subscribe(() => notifications++)); getters.push(getSnapshot);
+      assert.equal(getServerSnapshot().totalFollowers, 55007);
+      return getSnapshot();
+    } }
+  }, {
+    AbortController, setTimeout, clearTimeout,
+    setInterval: () => { timers++; return 1; }, clearInterval: () => { timers--; },
+    document: {hidden: false, addEventListener() {}, removeEventListener() {}},
+    fetch: async () => { requests++; return {ok: true, json: async () => ({platforms})}; }
+  });
+  store.useSocialCounts(); store.useSocialCounts(); store.useSocialCounts();
+  await new Promise(setImmediate);
+  assert.equal(requests, 1); assert.equal(timers, 1); assert.equal(notifications, 3);
+  assert.equal(getters[0]().totalFollowers, 55387);
+  assert.equal(getters[0](), getters[1]()); assert.equal(getters[1](), getters[2]());
+  cleanups.forEach(cleanup => cleanup()); assert.equal(timers, 0);
+});

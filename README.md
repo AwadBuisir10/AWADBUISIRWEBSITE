@@ -48,11 +48,17 @@ Visible tabs poll every five minutes; hidden tabs stop polling. Revalidation is
 traffic-driven, not a background cron: idle sites do not scrape, and a stale
 cache can be returned while a refresh runs. The CDN caches responses for 30 seconds.
 
-The UI includes all three platforms and labels rounded / saved / owner-confirmed
-counts with their observation dates. `data/socialCounts.ts` contains September 4
+All follower displays (reach card, metric row, globe, and inline audience copy)
+subscribe to one client store and one five-minute polling timer. The UI shows
+three platform counts and matching profile buttons without source-status labels.
+Approximate values retain the ≈ marker. `data/socialCounts.ts` contains September 4
 snapshots: Instagram ~26K, TikTok 11,965, and owner-confirmed Facebook 17,042.
 Facebook currently exposes likes, not followers, in its public metadata; it
 retains the confirmed snapshot until an explicit follower count is available.
 No login automation, proxy rotation, or anti-bot challenge bypass is used.
+
+Views, interactions, accounts reached, and growth are campaign milestones, not
+follower-derived analytics. Current milestone values follow the September resume:
+20M+ views, 1M+ interactions, 2.5M+ accounts reached, and +8,000% early growth.
 
 Run scraper and caching checks with `node --test tests/social-counts.test.cjs`.

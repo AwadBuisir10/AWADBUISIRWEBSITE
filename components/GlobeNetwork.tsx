@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { AudienceText } from "@/components/AudienceText";
 import { cities, type City } from "@/data/cities";
 import { landmasses, type LandRing } from "@/data/landmasses";
 
@@ -577,7 +578,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
                 {activeCity.story.title}
               </p>
               <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-seafoam-700">
-                {activeCity.story.metric}
+                <AudienceText>{activeCity.story.metric}</AudienceText>
               </p>
               <p className="mt-2 text-xs leading-5 text-slate 2xl:text-sm 2xl:leading-6">
                 {activeCity.story.detail}

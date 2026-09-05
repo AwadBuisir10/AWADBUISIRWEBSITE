@@ -1,3 +1,5 @@
+import { INITIAL_SOCIAL_COUNTS, summarizeCounts } from "@/data/socialCounts";
+
 export type Metric = {
   value: number;
   label: string;
@@ -14,14 +16,14 @@ export const impactMetrics: Metric[] = [
   { value: 30, label: "Hrs/week automated", detail: "Ya Hala FM" },
   { value: 70, label: "Sites supported", detail: "AL Prime Energy" },
   { value: 1000, suffix: "+", label: "Cameras operated", detail: "Distributed infra" },
-  { value: 12, suffix: "M+", label: "Views", detail: "Media system output" }
+  { value: 20, suffix: "M+", label: "Views", detail: "Campaign milestone" }
 ];
 
 /** LibyanClub section metrics. */
 export const communityMetrics: Metric[] = [
-  { value: 35, suffix: "K+", label: "Followers", detail: "in under six months" },
-  { value: 12, suffix: "M+", label: "Views", detail: "across campaigns" },
-  { value: 600, suffix: "K+", label: "Interactions", detail: "likes, comments, shares" },
-  { value: 2, decimals: 1, suffix: "M+", label: "Accounts reached", detail: "unique audience" },
-  { value: 8000, prefix: "+", suffix: "%", label: "Growth", detail: "since founding" }
+  { value: summarizeCounts(INITIAL_SOCIAL_COUNTS).totalFollowers, label: "Followers", detail: "across three platforms" }, // Live rendering uses the shared scraper store.
+  { value: 20, suffix: "M+", label: "Views", detail: "campaign milestone" },
+  { value: 1, suffix: "M+", label: "Interactions", detail: "campaign milestone" },
+  { value: 2.5, decimals: 1, suffix: "M+", label: "Accounts reached", detail: "campaign milestone" },
+  { value: 8000, prefix: "+", suffix: "%", label: "Growth", detail: "first six months" }
 ];

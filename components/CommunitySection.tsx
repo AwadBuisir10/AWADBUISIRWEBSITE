@@ -5,12 +5,13 @@ import Image from "next/image";
 import { ArrowDown, ArrowUpRight, Linkedin } from "lucide-react";
 import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { LiveSocialCounter } from "@/components/LiveSocialCounter";
+import { AudienceText, LiveFollowerTotal } from "@/components/AudienceText";
 import { SectionHeader } from "@/components/SectionHeader";
 import { communityMetrics } from "@/data/metrics";
-import { socialLinks } from "@/data/socialLinks";
+import { SOCIAL_NETWORKS, SOCIAL_PROFILES } from "@/data/socialCounts";
 import { community } from "@/data/site";
 
-const clubLinks = socialLinks.filter((link) => link.label.startsWith("LibyanClub"));
+const clubLinks = SOCIAL_NETWORKS.map(network => SOCIAL_PROFILES[network]);
 
 export function CommunitySection() {
   const reduced = useReducedMotion();
@@ -40,7 +41,7 @@ export function CommunitySection() {
 
           <div className="flex flex-col justify-between">
             <div>
-              <p className="max-w-2xl font-display text-2xl font-medium leading-snug tracking-[-.02em] text-navy sm:text-3xl">{community.copy}</p>
+              <p className="max-w-2xl font-display text-2xl font-medium leading-snug tracking-[-.02em] text-navy sm:text-3xl"><AudienceText>{community.copy}</AudienceText></p>
               <a href="#linkedin" className="group mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.1em] text-navy">
                 <Linkedin className="h-4 w-4 text-seafoam-700" aria-hidden="true" />View LinkedIn posts
                 <ArrowDown className="h-3.5 w-3.5 transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
@@ -51,7 +52,7 @@ export function CommunitySection() {
               <LiveSocialCounter />
               <div className="mt-7 flex flex-wrap gap-3">
                 {clubLinks.map((link) => (
-                  <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="group inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-white px-5 font-mono text-[12px] uppercase tracking-[.1em] text-navy shadow-card transition-all hover:-translate-y-0.5 hover:border-navy/40">
+                  <a key={link.url} href={link.url} target="_blank" rel="noreferrer" className="group inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-white px-5 font-mono text-[12px] uppercase tracking-[.1em] text-navy shadow-card transition-all hover:-translate-y-0.5 hover:border-navy/40">
                     {link.label.replace("LibyanClub ", "")}<ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </a>
                 ))}
@@ -76,7 +77,7 @@ export function CommunitySection() {
             {communityMetrics.map((metric, i) => (
               <div key={metric.label} className="border-b border-navy/10 px-4 py-6 last:border-b-0 sm:border-r sm:[&:nth-child(even)]:border-r-0 lg:border-b-0 lg:[&:nth-child(even)]:border-r lg:last:border-r-0">
                 <span className="font-mono text-[9px] text-steel">0{i + 1}</span>
-                <AnimatedNumber value={metric.value} decimals={metric.decimals} prefix={metric.prefix} suffix={metric.suffix} className="mt-3 block font-display text-3xl font-semibold tracking-[-.03em] text-seafoam-700 sm:text-4xl" />
+                {metric.label === "Followers" ? <LiveFollowerTotal className="mt-3 block font-display text-3xl font-semibold tracking-[-.03em] text-seafoam-700 sm:text-4xl" /> : <AnimatedNumber value={metric.value} decimals={metric.decimals} prefix={metric.prefix} suffix={metric.suffix} className="mt-3 block font-display text-3xl font-semibold tracking-[-.03em] text-seafoam-700 sm:text-4xl" />}
                 <p className="mt-2 font-mono text-[10px] uppercase tracking-[.1em] text-navy">{metric.label}</p>
                 {metric.detail ? <p className="mt-1 text-xs text-steel">{metric.detail}</p> : null}
               </div>

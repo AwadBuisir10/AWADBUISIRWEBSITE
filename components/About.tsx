@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { about } from "@/data/site";
+import { AudienceText } from "@/components/AudienceText";
 
 export function About() {
   const reduced = useReducedMotion();
@@ -63,10 +64,10 @@ export function About() {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                   >
                     <p className="mt-2 font-display text-2xl font-medium text-navy sm:text-3xl">
-                      {activePillar.proof}
+                      <AudienceText>{activePillar.proof}</AudienceText>
                     </p>
                     <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.08em] text-seafoam-700">
-                      {activePillar.signal}
+                      <AudienceText>{activePillar.signal}</AudienceText>
                     </p>
                   </motion.div>
                 </AnimatePresence>
