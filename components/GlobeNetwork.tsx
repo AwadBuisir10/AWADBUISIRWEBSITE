@@ -26,6 +26,14 @@ const ROUTE_LOOP = 12.8;
 const ROUTE_STAGGER = 2.05;
 const ARC_SAMPLES = 72;
 const ARC_LIFT = 0.11;
+/**
+ * Sphere radius as a fraction of the canvas's shorter side. Atmosphere, halo,
+ * route lift, and the satellite orbit reach ~1.3× the radius, so this keeps all
+ * of it inside the canvas; a radial mask fades whatever remains before the
+ * canvas edge, so nothing is ever cut by the canvas's rectangle.
+ */
+const RADIUS = 0.5 / 1.3;
+const EDGE_MASK = "radial-gradient(circle closest-side, #000 92%, transparent 100%)";
 /** Dots within this fraction of the radius swell under a mouse pointer. */
 const LENS = 0.22;
 /** Seconds of stillness after a drag before the globe drifts back to Boston. */
@@ -252,7 +260,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       const reduced = reducedQuery.matches;
       const centerX = width / 2;
       const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.46;
+      const radius = Math.min(width, height) * RADIUS;
       radiusPx = radius;
       const dt = lastTime ? Math.min(0.1, Math.max(0, time - lastTime)) : 0;
       lastTime = time;
@@ -301,7 +309,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       const orbitAngle = reduced ? 2.2 : time * 0.38;
       const orbitTilt = -0.34;
       const orbitAt = (angle: number) => {
-        const ex = Math.cos(angle) * radius * 1.26;
+        const ex = Math.cos(angle) * radius * 1.2;
         const ey = Math.sin(angle) * radius * 0.3;
         return {
           x: centerX + ex * Math.cos(orbitTilt) - ey * Math.sin(orbitTilt),
@@ -584,6 +592,10 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.clientWidth;
       height = canvas.clientHeight;
+      // Overlays (hint, story card) anchor to the sphere, not to the canvas box.
+      root.style.setProperty("--globe-x", `${width / 2}px`);
+      root.style.setProperty("--globe-y", `${height / 2}px`);
+      root.style.setProperty("--globe-r", `${Math.min(width, height) * RADIUS}px`);
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -694,6 +706,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       <canvas
         ref={canvasRef}
         aria-hidden="true"
+        style={{ WebkitMaskImage: EDGE_MASK, maskImage: EDGE_MASK }}
         className="pointer-events-none h-full w-full select-none font-mono"
       />
 
@@ -751,7 +764,8 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
 
       <span
         ref={hintRef}
-        className="pointer-events-none absolute right-[10%] top-[8%] z-20 inline-flex items-center gap-1.5 rounded-full border border-line/80 bg-white/80 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-steel shadow-card backdrop-blur transition-opacity duration-500"
+        style={{ left: "calc(var(--globe-x) + var(--globe-r) * 0.9)", top: "calc(var(--globe-y) - var(--globe-r) * 0.94)" }}
+        className="pointer-events-none absolute z-20 inline-flex -translate-x-full whitespace-nowrap items-center gap-1.5 rounded-full border border-line/80 bg-white/80 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-steel shadow-card backdrop-blur transition-opacity duration-500"
         aria-hidden="true"
       >
         <span className="text-signal">←</span> Drag to spin <span className="text-signal">→</span>
@@ -760,7 +774,8 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       {activeCity ? (
         <a
           href={activeCity.story.href}
-          className="absolute bottom-[6%] left-[9%] z-30 hidden w-[18.5rem] overflow-hidden rounded-lg border border-white bg-white/95 p-4 shadow-widget backdrop-blur-md transition-transform duration-200 hover:-translate-y-1 lg:block 2xl:w-[21rem] 2xl:p-5"
+          style={{ left: "calc(var(--globe-x) - var(--globe-r) * 0.92)", top: "calc(var(--globe-y) + var(--globe-r) * 1.02)" }}
+          className="absolute z-30 hidden w-[18.5rem] -translate-y-full overflow-hidden rounded-lg border border-white bg-white/95 p-4 shadow-widget backdrop-blur-md transition-transform duration-200 hover:translate-y-[calc(-100%_-_0.25rem)] lg:block 2xl:w-[21rem] 2xl:p-5"
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div

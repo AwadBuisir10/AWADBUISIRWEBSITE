@@ -23,7 +23,7 @@ export function Hero() {
   const words = hero.headline.split(" ");
 
   return (
-    <section ref={sectionRef} id="top" className="spotlight relative overflow-hidden bg-white [--spot-color:rgba(136,222,235,.22)] [--spot-size:760px]">
+    <section ref={sectionRef} id="top" className="spotlight relative overflow-x-clip bg-white [--spot-color:rgba(136,222,235,.22)] [--spot-size:760px]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_34%,rgba(136,222,235,.16),transparent_34%),radial-gradient(circle_at_10%_85%,rgba(68,180,139,.08),transparent_26%)]" aria-hidden="true" />
 
       <div className="relative mx-auto grid min-h-[92svh] max-w-shell items-center gap-8 px-5 pb-20 pt-28 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(32rem,.92fr)] lg:gap-4 lg:pb-24 lg:pt-24">
@@ -74,10 +74,12 @@ export function Hero() {
 
         <motion.div
           style={reduced ? undefined : { y: globeY, scale: globeScale }}
-          className="relative -mx-2 h-[21rem] overflow-hidden rounded-2xl border border-line/80 bg-white/55 shadow-[0_24px_80px_rgba(17,26,74,.08)] backdrop-blur-sm sm:mx-0 sm:h-[28rem] lg:h-[min(72vh,46rem)] lg:overflow-visible lg:border-0 lg:bg-transparent lg:shadow-none"
+          className="relative -mx-2 h-[24rem] overflow-hidden rounded-2xl border border-line/80 bg-white/55 shadow-[0_24px_80px_rgba(17,26,74,.08)] backdrop-blur-sm sm:mx-0 sm:h-[30rem] lg:h-[min(72vh,46rem)] lg:overflow-visible lg:border-0 lg:bg-transparent lg:shadow-none"
         >
-          <div className="scale-rise absolute inset-[-9%] lg:inset-[-12%]" style={delay(250)}>
-            <div className="absolute inset-[10%] rounded-full bg-[radial-gradient(circle_at_42%_38%,rgba(30,65,153,0.10),rgba(136,222,235,0.14)_58%,transparent_75%)] blur-2xl" aria-hidden="true" />
+          {/* Mobile: the whole globe sits inside the card, above its label bar. Desktop: a larger,
+              edge-faded canvas lets the atmosphere and orbit breathe without a box edge. */}
+          <div className="scale-rise absolute inset-x-0 bottom-10 top-0 lg:inset-[-24%]" style={delay(250)}>
+            <div className="absolute inset-[17%] rounded-full bg-[radial-gradient(circle_at_42%_38%,rgba(30,65,153,0.10),rgba(136,222,235,0.14)_58%,transparent_75%)] blur-2xl" aria-hidden="true" />
             <GlobeNetwork />
           </div>
           <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-line/70 bg-white/80 px-4 py-3 backdrop-blur-md lg:hidden">
