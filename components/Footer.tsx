@@ -58,7 +58,7 @@ export function Footer() {
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:linear-gradient(to_bottom,transparent,black_35%,black_70%,transparent)]" />
           <div className="aurora absolute -left-[10%] bottom-[-35%] h-[80%] w-[60%] rounded-full bg-[radial-gradient(circle,rgba(68,180,139,.22),transparent_62%)] blur-3xl" />
-          <div className="aurora absolute -right-[12%] top-[-25%] h-[75%] w-[55%] rounded-full bg-[radial-gradient(circle,rgba(30,65,153,.32),transparent_62%)] blur-3xl [animation-delay:-9s]" />
+          <div className="aurora absolute -right-[12%] top-[4%] h-[75%] w-[55%] rounded-full bg-[radial-gradient(circle,rgba(30,65,153,.32),transparent_62%)] blur-3xl [animation-delay:-9s]" />
         </div>
 
         <div className="relative mx-auto max-w-shell px-5 pb-6 pt-24 sm:px-8 sm:pt-28">

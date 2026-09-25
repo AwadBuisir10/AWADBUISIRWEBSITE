@@ -42,7 +42,8 @@ export function ContactSection() {
   return (
     <section ref={sectionRef} id="contact" data-nav-theme="dark" className="spotlight spotlight-dark section-anchor relative z-[2] overflow-hidden rounded-b-[2rem] bg-[#061821] py-20 text-white shadow-[0_40px_80px_-30px_rgba(0,0,0,.8)] sm:rounded-b-[3rem] sm:py-32">
       <motion.div
-        className="absolute -right-32 -top-32 h-[38rem] w-[38rem]"
+        // Sits inside the section vertically so its top edge never slices the ring; it still bleeds off the page's right edge.
+        className="absolute -right-48 top-10 h-[38rem] w-[38rem] sm:-right-32"
         animate={reduced ? undefined : { rotate: 360 }}
         transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
         aria-hidden="true"
