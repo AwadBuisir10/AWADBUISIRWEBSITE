@@ -1,10 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useSiteContent } from "@/components/ContentProvider";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { AudienceText } from "@/components/AudienceText";
-import { cities, type City } from "@/data/cities";
+import { type City } from "@/data/cities";
 import { landmasses, type LandRing } from "@/data/landmasses";
 
 /**
@@ -24,6 +26,10 @@ const ROUTE_LOOP = 12.8;
 const ROUTE_STAGGER = 2.05;
 const ARC_SAMPLES = 72;
 const ARC_LIFT = 0.11;
+/** Dots within this fraction of the radius swell under a mouse pointer. */
+const LENS = 0.22;
+/** Seconds of stillness after a drag before the globe drifts back to Boston. */
+const RETURN_AFTER = 2.6;
 
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
@@ -180,11 +186,9 @@ function buildLandDots(): LandDot[] {
   return dots;
 }
 
-const home = cities.find((city) => city.home) ?? cities[0];
-const homeVec = toVec(home.lat, home.lng);
 const landRings = landmasses.map((ring) => ring.map(([lat, lng]) => toVec(lat, lng)));
 
-function buildRoute(city: City): Route {
+function buildRoute(city: City, homeVec: Vec3): Route {
   const target = toVec(city.lat, city.lng);
   const points: Route["points"] = [];
   for (let index = 0; index <= ARC_SAMPLES; index += 1) {
@@ -197,32 +201,29 @@ function buildRoute(city: City): Route {
   return { city, points };
 }
 
-const routes = cities
-  .filter((city) => city.marker === "work" || city.marker === "purpose")
-  .map(buildRoute);
-const chapterRoutes = cities
-  .filter((city) => city.marker === "inspired" || city.marker === "network")
-  .map(buildRoute);
-
 export function GlobeNetwork({ className = "" }: { className?: string }) {
+  const { cities } = useSiteContent();
+  const home = cities.find((city) => city.home) ?? cities[0];
+  const { routes, chapterRoutes } = useMemo(() => {
+    if (!home) return { routes: [], chapterRoutes: [] };
+    const homeVec = toVec(home.lat, home.lng);
+    return {
+      routes: cities.filter(city => city.marker === "work" || city.marker === "purpose").map(city => buildRoute(city, homeVec)),
+      chapterRoutes: cities.filter(city => city.marker === "inspired" || city.marker === "network").map(city => buildRoute(city, homeVec))
+    };
+  }, [cities, home]);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLSpanElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodeRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const reducedMotion = useReducedMotion();
-  const [activeCityName, setActiveCityName] = useState(home.name);
+  const [activeCityName, setActiveCityName] = useState(home?.name ?? "");
   const activeCity = cities.find((city) => city.name === activeCityName) ?? home;
-
-  const navigateToStory = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
-    const target = document.querySelector(href);
-    if (!target) return;
-    event.preventDefault();
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-    window.history.pushState(null, "", href);
-  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const root = rootRef.current;
+    if (!canvas || !root) return;
     const context = canvas.getContext("2d");
     if (!context) return;
 
@@ -236,15 +237,38 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
     let inView = true;
     const start = performance.now();
 
+    // Drag-to-spin state: a user offset layered on top of the idle swing.
+    let offset = 0;
+    let velocity = 0;
+    let dragging = false;
+    let lastX = 0;
+    let lastMove = 0;
+    let idleSince = 0;
+    let lastTime = 0;
+    let radiusPx = 1;
+    const pointer = { x: 0, y: 0, active: false };
+
     const drawFrame = (time: number) => {
       const reduced = reducedQuery.matches;
       const centerX = width / 2;
       const centerY = height / 2;
       const radius = Math.min(width, height) * 0.46;
+      radiusPx = radius;
+      const dt = lastTime ? Math.min(0.1, Math.max(0, time - lastTime)) : 0;
+      lastTime = time;
+      if (!dragging && !reduced) {
+        offset += velocity * dt;
+        velocity *= Math.exp(-dt * 2.6);
+        if (Math.abs(velocity) < 0.03 && (performance.now() - idleSince) / 1000 > RETURN_AFTER) {
+          offset = Math.atan2(Math.sin(offset), Math.cos(offset));
+          offset -= offset * (1 - Math.exp(-dt * 0.9));
+        }
+      }
       const centerLng =
         (CENTER_LNG +
           (reduced ? 0 : SWING_DEG * Math.sin((2 * Math.PI * time) / SWING_PERIOD))) *
-        DEG;
+          DEG +
+        offset;
 
       context.clearRect(0, 0, width, height);
 
@@ -261,6 +285,74 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       halo.addColorStop(1, "rgba(255,255,255,0)");
       context.fillStyle = halo;
       context.fillRect(0, 0, width, height);
+
+      // Atmosphere: a cyan rim that peaks right at the limb.
+      const rim = context.createRadialGradient(centerX, centerY, radius * 0.9, centerX, centerY, radius * 1.16);
+      rim.addColorStop(0, "rgba(136, 222, 235, 0)");
+      rim.addColorStop(0.38, "rgba(136, 222, 235, 0.34)");
+      rim.addColorStop(0.62, "rgba(68, 180, 139, 0.10)");
+      rim.addColorStop(1, "rgba(136, 222, 235, 0)");
+      context.beginPath();
+      context.arc(centerX, centerY, radius * 1.16, 0, Math.PI * 2);
+      context.fillStyle = rim;
+      context.fill();
+
+      // Satellite on an inclined orbit; the far half is drawn before the sphere so it passes behind it.
+      const orbitAngle = reduced ? 2.2 : time * 0.38;
+      const orbitTilt = -0.34;
+      const orbitAt = (angle: number) => {
+        const ex = Math.cos(angle) * radius * 1.26;
+        const ey = Math.sin(angle) * radius * 0.3;
+        return {
+          x: centerX + ex * Math.cos(orbitTilt) - ey * Math.sin(orbitTilt),
+          y: centerY + ex * Math.sin(orbitTilt) + ey * Math.cos(orbitTilt),
+          front: Math.sin(angle) > 0
+        };
+      };
+      const drawOrbit = (front: boolean) => {
+        context.save();
+        context.setLineDash(front ? [] : [2, 5]);
+        context.beginPath();
+        for (let step = 0; step <= 96; step += 1) {
+          const angle = (front ? 0 : Math.PI) + (step / 96) * Math.PI;
+          const point = orbitAt(angle);
+          if (step === 0) context.moveTo(point.x, point.y);
+          else context.lineTo(point.x, point.y);
+        }
+        context.strokeStyle = `rgba(${NAVY}, ${front ? 0.16 : 0.1})`;
+        context.lineWidth = 0.8;
+        context.stroke();
+        context.restore();
+      };
+      const drawSatellite = () => {
+        for (let trail = 12; trail >= 0; trail -= 1) {
+          const point = orbitAt(orbitAngle - trail * 0.03);
+          if (point.front !== orbitAt(orbitAngle).front) continue;
+          context.beginPath();
+          context.arc(point.x, point.y, trail === 0 ? 2.6 : 1.6 * (1 - trail / 13), 0, Math.PI * 2);
+          context.fillStyle = trail === 0 ? `rgba(${SIGNAL}, 0.95)` : `rgba(${SIGNAL}, ${0.32 * (1 - trail / 13)})`;
+          context.fill();
+        }
+      };
+      drawOrbit(false);
+      if (!orbitAt(orbitAngle).front) drawSatellite();
+
+      // Soft sphere shading so the halftone sits on a body, not a flat disc.
+      const shade = context.createRadialGradient(
+        centerX - radius * 0.34,
+        centerY - radius * 0.4,
+        radius * 0.05,
+        centerX,
+        centerY,
+        radius
+      );
+      shade.addColorStop(0, "rgba(255, 255, 255, 0.7)");
+      shade.addColorStop(0.55, "rgba(238, 246, 250, 0.32)");
+      shade.addColorStop(1, `rgba(${NAVY}, 0.07)`);
+      context.beginPath();
+      context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      context.fillStyle = shade;
+      context.fill();
 
       context.beginPath();
       context.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -332,6 +424,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       // Signature halftone land layer from the design reference.
       const dotScale = Math.max(0.78, Math.min(1.25, radius / 300));
       const dotStride = width < 520 ? 2 : 1;
+      const lensRadius = radius * LENS;
       for (let dotIndex = 0; dotIndex < landDots.length; dotIndex += dotStride) {
         const dot = landDots[dotIndex];
         const point = project(dot.v, centerLng);
@@ -341,11 +434,18 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
           0,
           Math.min(colorRamp.length - 1, Math.round(((point.x + 1) / 2) * (colorRamp.length - 1)))
         );
-        const dotRadius = (0.82 + dot.size * 0.72) * dotScale * (0.8 + point.z * 0.24);
+        const x = screenX(point);
+        const y = screenY(point);
+        let lens = 0;
+        if (pointer.active && !dragging) {
+          const distance = Math.hypot(x - pointer.x, y - pointer.y);
+          if (distance < lensRadius) lens = smooth(1 - distance / lensRadius);
+        }
+        const dotRadius = (0.82 + dot.size * 0.72) * dotScale * (0.8 + point.z * 0.24) * (1 + lens * 1.3);
 
         context.beginPath();
-        context.arc(screenX(point), screenY(point), dotRadius, 0, Math.PI * 2);
-        context.fillStyle = `rgba(${colorRamp[rampIndex]}, ${0.2 + edgeFade * 0.5})`;
+        context.arc(x, y, dotRadius, 0, Math.PI * 2);
+        context.fillStyle = `rgba(${colorRamp[rampIndex]}, ${Math.min(1, 0.2 + edgeFade * 0.5 + lens * 0.35)})`;
         context.fill();
       }
 
@@ -366,6 +466,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
 
       // Great-circle routes from Boston.
       const arrivals = new Map<string, number>();
+      const ripples = new Map<string, number>();
       routes.forEach((route, routeIndex) => {
         let head = 1;
         let tail = 0;
@@ -380,6 +481,7 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
           tail = progress < 0.52 ? 0 : smooth((progress - 0.52) / 0.44);
           glow = Math.exp(-(((progress - 0.44) / 0.16) ** 2));
           arrivals.set(route.city.name, progress > 0.36 ? glow : 0);
+          ripples.set(route.city.name, progress);
         }
 
         const startIndex = Math.floor(tail * ARC_SAMPLES);
@@ -390,6 +492,28 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
         context.strokeStyle = `rgba(${SEAFOAM}, ${0.25 + 0.62 * glow})`;
         context.lineWidth = 1 + 0.7 * glow;
         context.stroke();
+
+        // A glowing comet head leads each route while it is in flight.
+        if (!reduced && head < 1) {
+          const { v, lift } = route.points[endIndex];
+          const point = project(v, centerLng);
+          if (point.z > -0.055) {
+            const x = screenX(point, lift);
+            const y = screenY(point, lift);
+            const comet = context.createRadialGradient(x, y, 0, x, y, 11);
+            comet.addColorStop(0, "rgba(148, 239, 183, 0.9)");
+            comet.addColorStop(0.35, "rgba(68, 180, 139, 0.32)");
+            comet.addColorStop(1, "rgba(68, 180, 139, 0)");
+            context.beginPath();
+            context.arc(x, y, 11, 0, Math.PI * 2);
+            context.fillStyle = comet;
+            context.fill();
+            context.beginPath();
+            context.arc(x, y, 2, 0, Math.PI * 2);
+            context.fillStyle = "rgba(255, 255, 255, 0.95)";
+            context.fill();
+          }
+        }
       });
 
       // Real city coordinates, projected on the same sphere as the land.
@@ -421,6 +545,17 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
           context.stroke();
         }
 
+        // Landing ripple as a route reaches its city.
+        const landed = ripples.get(city.name);
+        if (landed !== undefined && landed > 0.38 && landed < 0.8) {
+          const ring = (landed - 0.38) / 0.42;
+          context.beginPath();
+          context.arc(x, y, 3 + ring * 18, 0, Math.PI * 2);
+          context.strokeStyle = `rgba(${SEAFOAM}, ${(1 - ring) * 0.55 * fade})`;
+          context.lineWidth = 1.2;
+          context.stroke();
+        }
+
         const arrival = arrivals.get(city.name) ?? 0;
         const chapterNode = city.marker === "inspired" || city.marker === "network";
         const signalNode = city.marker === "origin" || city.marker === "inspired";
@@ -437,13 +572,18 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
           : `rgba(${SEAFOAM}, ${(0.62 + 0.36 * arrival) * fade})`;
         context.fill();
       }
+
+      drawOrbit(true);
+      if (orbitAt(orbitAngle).front) drawSatellite();
     };
 
     const resize = () => {
-      const rect = canvas.getBoundingClientRect();
+      // Layout size, not getBoundingClientRect(): the hero scales this globe
+      // (entrance + scroll parallax), and a transformed measurement drew the
+      // canvas at one size while the city pins were placed at another.
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-      width = rect.width;
-      height = rect.height;
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -476,6 +616,54 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
       }
     };
 
+    // Pointer position in the canvas's own (untransformed) coordinates.
+    const locate = (event: PointerEvent) => {
+      const rect = root.getBoundingClientRect();
+      const scale = rect.width ? root.offsetWidth / rect.width : 1;
+      pointer.x = (event.clientX - rect.left) * scale;
+      pointer.y = (event.clientY - rect.top) * scale;
+      return scale;
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Element && event.target.closest("a")) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      dragging = true;
+      velocity = 0;
+      lastX = event.clientX;
+      lastMove = performance.now();
+      root.setPointerCapture(event.pointerId);
+      root.dataset.dragging = "true";
+      if (hintRef.current) hintRef.current.style.opacity = "0";
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      const scale = locate(event);
+      pointer.active = event.pointerType === "mouse";
+      if (!dragging) return;
+      const now = performance.now();
+      const delta = (-(event.clientX - lastX) * scale) / Math.max(1, radiusPx);
+      offset += delta;
+      velocity = Math.max(-6, Math.min(6, velocity * 0.5 + (delta / Math.max(0.008, (now - lastMove) / 1000)) * 0.5));
+      lastX = event.clientX;
+      lastMove = now;
+      if (reducedQuery.matches) drawFrame(0);
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      idleSince = performance.now();
+      if (idleSince - lastMove > 90 || reducedQuery.matches) velocity = 0;
+      if (root.hasPointerCapture(event.pointerId)) root.releasePointerCapture(event.pointerId);
+      delete root.dataset.dragging;
+    };
+    const onPointerLeave = () => {
+      pointer.active = false;
+    };
+    root.addEventListener("pointerdown", onPointerDown);
+    root.addEventListener("pointermove", onPointerMove);
+    root.addEventListener("pointerup", onPointerUp);
+    root.addEventListener("pointercancel", onPointerUp);
+    root.addEventListener("pointerleave", onPointerLeave);
+
     const observer = new IntersectionObserver(([entry]) => {
       inView = entry.isIntersecting;
       applyMotionPreference();
@@ -490,14 +678,19 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
 
     return () => {
       setRunning(false);
+      root.removeEventListener("pointerdown", onPointerDown);
+      root.removeEventListener("pointermove", onPointerMove);
+      root.removeEventListener("pointerup", onPointerUp);
+      root.removeEventListener("pointercancel", onPointerUp);
+      root.removeEventListener("pointerleave", onPointerLeave);
       observer.disconnect();
       resizeObserver.disconnect();
       reducedQuery.removeEventListener("change", applyMotionPreference);
     };
-  }, []);
+  }, [cities, home, routes, chapterRoutes]);
 
   return (
-    <div className={`relative h-full w-full ${className}`}>
+    <div ref={rootRef} className={`relative h-full w-full cursor-grab touch-pan-y select-none data-[dragging=true]:cursor-grabbing ${className}`}>
       <canvas
         ref={canvasRef}
         aria-hidden="true"
@@ -518,11 +711,10 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
                 nodeRefs.current[city.name] = node;
               }}
               href={city.story.href}
-              onClick={(event) => navigateToStory(event, city.story.href)}
               onMouseEnter={() => setActiveCityName(city.name)}
-              onMouseLeave={() => setActiveCityName(home.name)}
+              onMouseLeave={() => setActiveCityName(home?.name ?? "")}
               onFocus={() => setActiveCityName(city.name)}
-              onBlur={() => setActiveCityName(home.name)}
+              onBlur={() => setActiveCityName(home?.name ?? "")}
               aria-label={`${city.name}: ${city.story.title}`}
               className={`group absolute left-0 top-0 z-20 h-8 w-8 items-center justify-center rounded-full opacity-0 transition-[opacity,border-color,background-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/30 ${primaryNode ? "flex" : "hidden lg:flex"} ${
                 primaryNode
@@ -557,10 +749,17 @@ export function GlobeNetwork({ className = "" }: { className?: string }) {
         })}
       </div>
 
+      <span
+        ref={hintRef}
+        className="pointer-events-none absolute right-[10%] top-[8%] z-20 inline-flex items-center gap-1.5 rounded-full border border-line/80 bg-white/80 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-steel shadow-card backdrop-blur transition-opacity duration-500"
+        aria-hidden="true"
+      >
+        <span className="text-signal">←</span> Drag to spin <span className="text-signal">→</span>
+      </span>
+
       {activeCity ? (
         <a
           href={activeCity.story.href}
-          onClick={(event) => navigateToStory(event, activeCity.story.href)}
           className="absolute bottom-[6%] left-[9%] z-30 hidden w-[18.5rem] overflow-hidden rounded-lg border border-white bg-white/95 p-4 shadow-widget backdrop-blur-md transition-transform duration-200 hover:-translate-y-1 lg:block 2xl:w-[21rem] 2xl:p-5"
         >
           <AnimatePresence mode="wait" initial={false}>

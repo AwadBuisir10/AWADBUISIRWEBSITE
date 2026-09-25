@@ -1,29 +1,15 @@
 "use client";
 
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useSiteContent } from "@/components/ContentProvider";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Linkedin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 
-const linkedInPosts = [
-  {
-    label: "Founder update",
-    src: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7413672796016496640?collapsed=1",
-    href: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7413672796016496640/",
-    title: "LinkedIn post by Awad Buisir about LibyanClub"
-  },
-  {
-    label: "Community milestone",
-    src: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7396761969028149248?collapsed=1",
-    href: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7396761969028149248/",
-    title: "LinkedIn post by Awad Buisir about a LibyanClub community milestone"
-  }
-];
-
-const outsidePerspective =
-  "https://www.linkedin.com/posts/nourelhodaa_just-over-two-months-ago-libyanclub-was-activity-7413676082077274112-WIHm?utm_source=share&utm_medium=member_desktop&rcm=ACoAADD4wRoBsE3tqCOgAdV0Px32jbFAPkRy1lY";
-
 export function LinkedInHighlights() {
+  const { linkedIn, sectionHeadings } = useSiteContent();
+  const linkedInPosts = linkedIn.posts;
   const sectionRef = useRef<HTMLElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
@@ -59,10 +45,8 @@ export function LinkedInHighlights() {
     <section ref={sectionRef} id="linkedin" className="section-anchor overflow-hidden border-t border-navy/10 py-20 sm:py-28">
       <div className="mx-auto max-w-shell px-5 sm:px-8">
         <SectionHeader
-          index="04"
-          eyebrow="LinkedIn"
-          title="LinkedIn Posts"
-          note="Launches, community milestones, and outside perspective."
+          index="06"
+          {...sectionHeadings.linkedIn}
         />
 
         <div className="mt-12 grid min-w-0 items-start gap-12 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
@@ -74,14 +58,14 @@ export function LinkedInHighlights() {
             className="min-w-0 lg:sticky lg:top-28"
           >
             <p className="max-w-full font-display text-xl font-medium leading-8 text-navy">
-              Public notes from the work, not a second resume.
+              {linkedIn.intro}
             </p>
             <p className="mt-3 max-w-full text-[15px] leading-7 text-slate">
-              These posts document LibyanClub's growth and the people who saw it happen.
+              {linkedIn.description}
             </p>
 
             <a
-              href={outsidePerspective}
+              href={linkedIn.outsidePerspectiveUrl}
               target="_blank"
               rel="noreferrer"
               className="group mt-8 block border-y border-line py-4"
@@ -91,7 +75,7 @@ export function LinkedInHighlights() {
                 Outside perspective
               </span>
               <span className="mt-2 flex items-center justify-between gap-4 text-sm font-medium leading-6 text-navy">
-                Nourelhodaa on LibyanClub's reach
+                {linkedIn.outsidePerspectiveLabel}
                 <ArrowUpRight
                   className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                   aria-hidden="true"
@@ -102,10 +86,10 @@ export function LinkedInHighlights() {
 
           <div className="min-w-0 max-w-full">
             <div className="mb-5 flex items-center justify-between sm:hidden">
-              <span className="font-mono text-[10px] uppercase tracking-[.12em] text-steel">Document {String(activePost + 1).padStart(2, "0")} / 02</span>
+              <span className="font-mono text-[10px] uppercase tracking-[.12em] text-steel">Document {String(linkedInPosts.length ? Math.min(activePost + 1, linkedInPosts.length) : 0).padStart(2, "0")} / {String(linkedInPosts.length).padStart(2, "0")}</span>
               <div className="flex gap-2">
-                <button type="button" aria-label="Previous LinkedIn post" onClick={() => scrollToPost((activePost - 1 + linkedInPosts.length) % linkedInPosts.length)} className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-navy shadow-card"><ArrowLeft className="h-4 w-4" aria-hidden="true" /></button>
-                <button type="button" aria-label="Next LinkedIn post" onClick={() => scrollToPost((activePost + 1) % linkedInPosts.length)} className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-navy shadow-card"><ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
+                <button type="button" disabled={linkedInPosts.length < 2} aria-label="Previous LinkedIn post" onClick={() => scrollToPost((activePost - 1 + linkedInPosts.length) % linkedInPosts.length)} className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-navy shadow-card"><ArrowLeft className="h-4 w-4" aria-hidden="true" /></button>
+                <button type="button" disabled={linkedInPosts.length < 2} aria-label="Next LinkedIn post" onClick={() => scrollToPost((activePost + 1) % linkedInPosts.length)} className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-navy shadow-card"><ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
               </div>
             </div>
             <div ref={carouselRef} onScroll={(event) => {
@@ -170,7 +154,7 @@ function DeferredLinkedInEmbed({ src, title }: { src: string; title: string }) {
 
   return (
     <div ref={ref} className="absolute inset-0">
-      {nearViewport ? <iframe src={src} title={title} width="504" height="626" loading="lazy" allowFullScreen className="h-full w-full border-0 bg-white" /> : <div className="flex h-full items-center justify-center bg-white font-mono text-[10px] uppercase tracking-[.12em] text-steel">LinkedIn document</div>}
+      {nearViewport && src ? <iframe src={src} title={title} width="504" height="626" loading="lazy" allowFullScreen className="h-full w-full border-0 bg-white" /> : <div className="flex h-full items-center justify-center bg-white font-mono text-[10px] uppercase tracking-[.12em] text-steel">LinkedIn document</div>}
     </div>
   );
 }

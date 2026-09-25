@@ -31,7 +31,7 @@ export const cities: City[] = [
     marker: "origin",
     label: { side: "right", offsetY: -4 },
     story: {
-      eyebrow: "Origin / Boston",
+      eyebrow: "Boston",
       title: "America's first Libyan student club",
       metric: "Founded at Northeastern · 31K+ followers",
       detail:
@@ -60,7 +60,7 @@ export const cities: City[] = [
     marker: "purpose",
     label: { side: "right" },
     story: {
-      eyebrow: "Purpose / Libya",
+      eyebrow: "Libya",
       title: "Building toward Libya's future",
       metric: "Identity · ideas · community",
       detail:

@@ -1,19 +1,23 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import Image from "next/image";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ProjectStack } from "@/components/ProjectStack";
 import type { Project } from "@/data/projects";
+import { onProjectOpen } from "@/lib/project-events";
 
-const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
+const isVideo = (src: string) => /\.(mp4|webm|mov)(?:[?#]|$)/i.test(src);
 
 export function ProjectTile({ project, index, active, onActivate }: { project: Project; index: number; active: boolean; onActivate: () => void }) {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const number = String(index + 1).padStart(2, "0");
   const detailsId = `${project.slug}-details`;
+
+  useEffect(() => onProjectOpen((slug) => { if (slug === project.slug) setOpen(true); }), [project.slug]);
 
   const toggleOpen = () => {
     onActivate();
@@ -24,29 +28,30 @@ export function ProjectTile({ project, index, active, onActivate }: { project: P
     <motion.article
       id={project.slug}
       layout
-      initial={false}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
       exit={reduced ? undefined : { opacity: 0, y: -10 }}
-      transition={{ duration: 0.32, ease: "easeOut", layout: { duration: 0.3 } }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], layout: { duration: 0.3 } }}
       onMouseEnter={onActivate}
       onFocus={onActivate}
-      className={`group relative border-b border-line transition-colors duration-300 ${active ? "bg-white/75" : "bg-transparent"}`}
+      className={`spotlight group relative scroll-mt-24 border-b border-line transition-colors duration-300 ${active ? "bg-white/75" : "bg-transparent"}`}
     >
-      <span className={`absolute inset-y-0 left-0 w-0.5 origin-top bg-signal transition-transform duration-300 ${active ? "scale-y-100" : "scale-y-0"}`} aria-hidden="true" />
+      <span className={`absolute inset-y-0 left-0 w-0.5 origin-top bg-signal transition-transform duration-500 ${active ? "scale-y-100" : "scale-y-0"}`} aria-hidden="true" />
       <div className="px-4 py-7 sm:px-5 sm:py-8">
         <div className="flex items-start gap-4 sm:gap-6">
-          <span className="pt-1 font-mono text-xs text-fog">{number}</span>
+          <span className={`pt-1 font-mono text-xs transition-colors duration-300 ${active ? "text-signal" : "text-fog"}`}>{number}</span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
               <h3 className="font-display text-2xl font-medium tracking-[-0.015em] text-navy sm:text-3xl">
                 <button type="button" onClick={toggleOpen} aria-expanded={open} aria-controls={detailsId} className="group/title inline-flex items-center gap-2 text-left">
-                  {project.title}
+                  <span className="transition-transform duration-300 group-hover/title:translate-x-1">{project.title}</span>
                   <ChevronDown className={`h-4 w-4 shrink-0 text-fog transition-transform duration-300 ${open ? "rotate-180 text-navy" : ""}`} aria-hidden="true" />
                 </button>
               </h3>
               {project.link ? (
-                <a href={project.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-navy shadow-card transition-all hover:border-navy/40">
-                  {project.linkLabel ?? "View"}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span>
+                <a href={project.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-navy shadow-card transition-[border-color,transform] hover:-translate-y-0.5 hover:border-navy/40">
+                  {project.linkLabel || "View"}<ArrowUpRight className="h-3 w-3" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span>
                 </a>
               ) : (
                 <span className="inline-flex items-center rounded-lg border border-dashed border-line bg-white px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-steel">
@@ -60,8 +65,8 @@ export function ProjectTile({ project, index, active, onActivate }: { project: P
               <ol aria-label={`${project.title} technology stack`} className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 {project.stack.map((layer, layerIndex) => (
                   <li key={`${project.slug}-${layer.label}`} className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.07em] text-steel">
-                    <span>{layer.tool}</span>
-                    {layerIndex < project.stack.length - 1 ? <span className="text-mist" aria-hidden="true">→</span> : null}
+                    <span className="transition-colors duration-300 group-hover:text-navy" style={{ transitionDelay: `${layerIndex * 60}ms` }}>{layer.tool}</span>
+                    {layerIndex < project.stack.length - 1 ? <span className="text-mist transition-colors duration-300 group-hover:text-seafoam-600" style={{ transitionDelay: `${layerIndex * 60 + 30}ms` }} aria-hidden="true">→</span> : null}
                   </li>
                 ))}
               </ol>
@@ -77,7 +82,7 @@ export function ProjectTile({ project, index, active, onActivate }: { project: P
 
         <AnimatePresence initial={false}>
           {open ? (
-            <motion.div id={detailsId} initial={reduced ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduced ? undefined : { height: 0, opacity: 0 }} transition={{ duration: .34, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
+            <motion.div id={detailsId} initial={reduced ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduced ? undefined : { height: 0, opacity: 0 }} transition={{ duration: .45, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
               <div className="pt-7 sm:pl-10">
                 <p className="max-w-2xl text-[15px] leading-7 text-slate">{project.summary}</p>
                 <div className="mt-7">
@@ -91,7 +96,7 @@ export function ProjectTile({ project, index, active, onActivate }: { project: P
                 </div>
                 {project.contextImage ? (
                   <figure className="relative mt-6 aspect-[16/7] max-w-xl overflow-hidden rounded-lg border border-line lg:hidden">
-                    <Image src={project.contextImage} alt={project.contextAlt ?? `${project.title} context`} fill sizes="90vw" className="object-cover" />
+                    <Image src={project.contextImage} alt={project.contextAlt || `${project.title} context`} fill sizes="90vw" className="object-cover" />
                     <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 font-mono text-[9px] uppercase tracking-[.1em] text-white">{project.contextCaption}</figcaption>
                   </figure>
                 ) : null}

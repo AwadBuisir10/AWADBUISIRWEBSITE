@@ -6,6 +6,11 @@ export type SocialLink = {
 
 export const socialLinks: SocialLink[] = [
   {
+    label: "GitHub",
+    href: "https://github.com/AwadBuisir10",
+    network: "github"
+  },
+  {
     label: "LibyanClub Instagram",
     href: "https://www.instagram.com/libyansclub/",
     network: "instagram"
@@ -22,7 +27,7 @@ export const socialLinks: SocialLink[] = [
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/awad-buisir-0221a41ab/",
+    href: "https://www.linkedin.com/in/awad-buisir/",
     network: "linkedin"
   }
 ];

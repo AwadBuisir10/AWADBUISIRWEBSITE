@@ -15,19 +15,19 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://awadbuisirwebsite.vercel.app"),
-  title: "Awad Buisir — Software, AI & Media Systems",
+  metadataBase: new URL("https://awadbuisir.com"),
+  title: "Awad Buisir — Software Engineer · Applied AI",
   description:
-    "CS at Northeastern. Software, AI automation, creative strategy, and community building — connected by execution.",
+    "CS at Northeastern (3.84 GPA). Software engineer building applied-AI systems — voice agents, computer vision, and LLM pipelines that do real work.",
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
   openGraph: {
-    title: "Awad Buisir — Software, AI & Media Systems",
+    title: "Awad Buisir — Software Engineer · Applied AI",
     description:
-      "Software, AI workflows, and media systems that create visible impact.",
+      "Applied-AI software systems: voice agents, computer vision, and LLM pipelines — designed, shipped, and operated end to end.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Awad Buisir portfolio" }]
   },
-  twitter: { card: "summary_large_image", title: "Awad Buisir — Software, AI & Media Systems", description: "Software, AI workflows, and media systems that create visible impact.", images: ["/opengraph-image"] }
+  twitter: { card: "summary_large_image", title: "Awad Buisir — Software Engineer · Applied AI", description: "Applied-AI software systems: voice agents, computer vision, and LLM pipelines — designed, shipped, and operated end to end.", images: ["/opengraph-image"] }
 };
 
 export default function RootLayout({
@@ -45,12 +45,12 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: "Awad Buisir",
-              url: "https://awadbuisirwebsite.vercel.app",
+              url: "https://awadbuisir.com",
               jobTitle: "Software Engineer",
               alumniOf: { "@type": "CollegeOrUniversity", name: "Northeastern University" },
               sameAs: [
-                "https://www.linkedin.com/in/awad-buisir-0221a41ab/",
-                "https://github.com/ABuisir10",
+                "https://www.linkedin.com/in/awad-buisir/",
+                "https://github.com/AwadBuisir10",
                 "https://www.instagram.com/awadbuisir/"
               ]
             })

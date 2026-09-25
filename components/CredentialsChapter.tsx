@@ -1,18 +1,21 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useSiteContent } from "@/components/ContentProvider";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import Image from "next/image";
 import { ArrowUpRight, FileText, Plus } from "lucide-react";
 import { SectionHeader } from "@/components/SectionHeader";
-import { experiences, skillGroups } from "@/data/site";
+import { TiltCard } from "@/components/TiltCard";
 
 export function CredentialsChapter() {
+  const { experiences, skillGroups, education, certificate, sectionHeadings } = useSiteContent();
   const reduced = useReducedMotion();
 
   return (
     <section id="experience" className="section-anchor py-20 sm:py-28">
       <div className="mx-auto max-w-shell px-5 sm:px-8">
-        <SectionHeader index="06" eyebrow="Proof" title="Experience" note="Roles, systems, and the tools behind the work." />
+        <SectionHeader index="03" {...sectionHeadings.experience} />
         <div className="mt-10 grid gap-16 lg:grid-cols-[1.15fr_.85fr] lg:gap-24">
           <div>
             <div className="relative before:absolute before:bottom-4 before:left-[.42rem] before:top-5 before:w-px before:bg-line">
@@ -34,11 +37,14 @@ export function CredentialsChapter() {
                 </motion.details>
               ))}
             </div>
-            <p className="mt-10 border-l-2 border-signal pl-4 font-mono text-[11px] uppercase leading-6 tracking-[.1em] text-steel">Northeastern University · BS Computer Science · GPA 3.84 · Dean&apos;s List · Expected Aug 2027</p>
+            <p className="mt-10 border-l-2 border-signal pl-4 font-mono text-[11px] uppercase leading-6 tracking-[.1em] text-steel">
+              {education.summary}
+              {education.coursework ? <span className="mt-2 block text-fog">Coursework · {education.coursework}</span> : null}
+            </p>
           </div>
 
           <aside id="skills" className="section-anchor lg:sticky lg:top-28 lg:self-start">
-            <div className="flex items-center gap-3 border-b border-line pb-4 font-mono text-[11px] uppercase tracking-[.12em] text-navy"><span className="text-fog">08</span><span className="h-1.5 w-1.5 rounded-full bg-seafoam-600" aria-hidden="true" />Skills ledger</div>
+            <div className="flex items-center gap-3 border-b border-line pb-4 font-mono text-[11px] uppercase tracking-[.12em] text-navy"><span className="text-fog">04</span><span className="h-1.5 w-1.5 rounded-full bg-seafoam-600" aria-hidden="true" />Skills ledger</div>
             <div className="mt-4 space-y-7">
               {skillGroups.map((group, index) => (
                 <motion.div key={group.title} initial={false} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: reduced ? 0 : index * .04 }}>
@@ -52,23 +58,25 @@ export function CredentialsChapter() {
 
         <div className="mt-16 border-t border-line pt-8">
           <div className="mb-5 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[.12em] text-navy"><span className="h-1.5 w-1.5 rounded-full bg-signal" aria-hidden="true" />Professional certificate</div>
-          <article className="grid overflow-hidden rounded-xl border border-line bg-white shadow-elevated lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,.75fr)]">
-            <a href="/certificates/google-ai-professional-certificate.pdf" target="_blank" rel="noreferrer" className="group relative aspect-[22/17] overflow-hidden bg-[#eef3f8]">
-              <Image src="/certificates/google-ai-professional-certificate.webp" alt="Google AI Professional Certificate awarded to Awad M Buisir" fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-contain transition-transform duration-500 group-hover:scale-[1.015]" />
-              <span className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/85 text-navy shadow-card backdrop-blur" aria-hidden="true"><ArrowUpRight className="h-4 w-4" /></span>
-            </a>
-            <div className="flex flex-col justify-between p-6 sm:p-8">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[.12em] text-seafoam-700">Google / Coursera · Jul 12, 2026</p>
-                <h3 className="mt-4 font-display text-3xl font-medium leading-tight tracking-[-.03em] text-navy">Google AI Professional Certificate</h3>
-                <p className="mt-4 text-[15px] leading-7 text-slate">Seven-course professional program covering AI-assisted research, communication, content creation, data analysis, app building, and responsible prompting.</p>
+          <TiltCard max={1} className="rounded-xl">
+            <article className="grid overflow-hidden rounded-xl border border-line bg-white shadow-elevated lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,.75fr)]">
+              <a href={certificate.file} target="_blank" rel="noreferrer" className="group relative aspect-[22/17] overflow-hidden bg-[#eef3f8]">
+                {certificate.image ? <Image src={certificate.image} alt={certificate.imageAlt} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-contain transition-transform duration-500 group-hover:scale-[1.015]" /> : null}
+                <span className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/85 text-navy shadow-card backdrop-blur" aria-hidden="true"><ArrowUpRight className="h-4 w-4" /></span>
+              </a>
+              <div className="flex flex-col justify-between p-6 sm:p-8">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[.12em] text-seafoam-700">{certificate.eyebrow}</p>
+                  <h3 className="mt-4 font-display text-3xl font-medium leading-tight tracking-[-.03em] text-navy">{certificate.title}</h3>
+                  <p className="mt-4 text-[15px] leading-7 text-slate">{certificate.description}</p>
+                </div>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <a href={certificate.file} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-navy px-5 font-mono text-[10px] uppercase tracking-[.1em] text-white"><FileText className="h-4 w-4" aria-hidden="true" />View certificate</a>
+                  <a href={certificate.verificationUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line px-5 font-mono text-[10px] uppercase tracking-[.1em] text-navy">Verify credential<ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /></a>
+                </div>
               </div>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a href="/certificates/google-ai-professional-certificate.pdf" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-navy px-5 font-mono text-[10px] uppercase tracking-[.1em] text-white"><FileText className="h-4 w-4" aria-hidden="true" />View certificate</a>
-                <a href="https://coursera.org/verify/professional-cert/C1A1H99S1YFE" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line px-5 font-mono text-[10px] uppercase tracking-[.1em] text-navy">Verify credential<ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /></a>
-              </div>
-            </div>
-          </article>
+            </article>
+          </TiltCard>
         </div>
       </div>
     </section>
