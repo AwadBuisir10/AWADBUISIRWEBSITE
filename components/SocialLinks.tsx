@@ -1,19 +1,21 @@
 "use client";
 
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { useSiteContent } from "@/components/ContentProvider";
+import { Facebook, Github, Instagram, Linkedin } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { socialLinks } from "@/data/socialLinks";
 
 const icons: Record<string, LucideIcon> = {
   instagram: Instagram,
   facebook: Facebook,
-  linkedin: Linkedin
+  linkedin: Linkedin,
+  github: Github
 };
 
 export function SocialLinks({ className = "", dark = false }: { className?: string; dark?: boolean }) {
+  const { socialLinks } = useSiteContent();
   return (
     <ul className={`flex items-center gap-1 ${className}`}>
-      {socialLinks.map((link) => {
+      {socialLinks.filter(link => link.href).map((link) => {
         const Icon = icons[link.network] ?? Instagram;
         return (
           <li key={link.href}>

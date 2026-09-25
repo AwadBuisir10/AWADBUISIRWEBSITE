@@ -8,7 +8,8 @@ const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: __dirname,
   images: {
-    formats: ["image/avif", "image/webp"]
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [{ protocol: "https", hostname: "cdn.sanity.io", pathname: "/images/**" }]
   }
 };
 

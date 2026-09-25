@@ -1,17 +1,20 @@
 "use client";
 
-import { motion, useAnimationFrame, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
+import { useSiteContent } from "@/components/ContentProvider";
+import { motion, useAnimationFrame, useMotionValue, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
-import { formatViews, reels, type Reel } from "@/data/reels";
+import { formatViews, type Reel } from "@/data/reels";
 
 const SPEED = 24;
 const GAP = 20;
 const wrap = (min: number, max: number, value: number) => min + (((value - min) % (max - min)) + (max - min)) % (max - min);
 
 export function ReelCarousel() {
+  const { reels, sectionHeadings } = useSiteContent();
   const reduced = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const groupRef = useRef<HTMLDivElement>(null);
@@ -50,7 +53,7 @@ export function ReelCarousel() {
     const observer = new ResizeObserver(measure);
     observer.observe(group);
     return () => observer.disconnect();
-  }, [coarse]);
+  }, [coarse, reels]);
 
   useAnimationFrame((_, delta) => {
     if (reduced || coarse || pausedRef.current || draggingRef.current || !visibleRef.current || document.hidden || !distanceRef.current) return;
@@ -69,10 +72,12 @@ export function ReelCarousel() {
     scroller.scrollBy({ left: direction * distance, behavior: reduced ? "auto" : "smooth" });
   };
 
+  if (!reels.length) return null;
+
   return (
     <section ref={sectionRef} id="reels" className="section-anchor overflow-hidden border-t border-navy/10 py-20 sm:py-28">
       <div className="mx-auto max-w-shell px-5 sm:px-8">
-        <SectionHeader index="05" eyebrow="Media evidence" title="Featured Reels" note="Drag to explore. Tap a card to watch on Instagram." />
+        <SectionHeader index="07" {...sectionHeadings.reels} />
         {(coarse || reduced) ? (
           <>
             <div className="mt-8 flex items-center justify-between">
@@ -110,7 +115,7 @@ function ReelCard({ reel, active = false, duplicate = false }: { reel: Reel; act
   return (
     <article className={`w-[78vw] max-w-[330px] shrink-0 snap-center transition-all duration-300 sm:w-[330px] ${active ? "scale-100 opacity-100" : "scale-[.96] opacity-80 sm:scale-100 sm:opacity-100"}`}>
       <a href={reel.url} target="_blank" rel="noreferrer" aria-label={`Watch “${reel.title}” on Instagram`} draggable={false} tabIndex={duplicate ? -1 : undefined} className="group relative block aspect-[4/5] overflow-hidden rounded-xl border border-line bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated">
-        <Image src={reel.thumbnail} alt="" fill sizes="(max-width: 767px) 78vw, 330px" draggable={false} className="select-none object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+        {reel.thumbnail ? <Image src={reel.thumbnail} alt="" fill sizes="(max-width: 767px) 78vw, 330px" draggable={false} className="select-none object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> : null}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" aria-hidden="true" />
         <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-navy/65 text-white backdrop-blur-sm transition-transform group-hover:scale-110" aria-hidden="true"><Play className="ml-0.5 h-5 w-5 fill-current" /></span>
         <div className="absolute inset-x-0 bottom-0 p-5">

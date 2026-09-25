@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ScrambleText } from "@/components/ScrambleText";
 
-const chapters = [
+/** Story chapters shared by the wide-screen rail and the navbar's "you are here" label. */
+export const chapters = [
   { id: "about", number: "01", label: "Origin" },
   { id: "work", number: "02", label: "Build" },
-  { id: "community", number: "03", label: "Reach" },
-  { id: "experience", number: "06", label: "Proof" },
-  { id: "creative", number: "07", label: "Create" },
+  { id: "experience", number: "03", label: "Proof" },
+  { id: "community", number: "05", label: "Reach" },
+  { id: "creative", number: "08", label: "Create" },
   { id: "contact", number: "09", label: "Connect" }
 ];
 
+/** Wide-screen (2xl) chapter rail. On smaller screens, progress lives in the navbar. */
 export function ExecutionRail() {
   const [active, setActive] = useState(chapters[0].id);
   const [progress, setProgress] = useState(0);
@@ -45,29 +48,21 @@ export function ExecutionRail() {
     };
   }, []);
 
-  const current = chapters.find((chapter) => chapter.id === active) ?? chapters[0];
-
   return (
-    <>
-      <div className="route-mobile" aria-hidden="true">
-        <span className="route-mobile__fill" style={{ transform: `scaleX(${progress})` }} />
-        <span className="route-mobile__label">{current.number} / {current.label}</span>
-      </div>
-      <aside className="execution-rail" aria-label="Page chapters">
-        <span className="execution-rail__track" aria-hidden="true">
-          <span className="execution-rail__progress" style={{ transform: `scaleY(${progress})` }} />
-        </span>
-        <ol className="execution-rail__labels">
-          {chapters.map((chapter) => (
-            <li key={chapter.id} className={active === chapter.id ? "is-active" : ""}>
-              <a href={`#${chapter.id}`} aria-current={active === chapter.id ? "location" : undefined}>
-                <span>{chapter.number}</span>
-                {chapter.label}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </aside>
-    </>
+    <aside className="execution-rail" aria-label="Page chapters">
+      <span className="execution-rail__track" aria-hidden="true">
+        <span className="execution-rail__progress" style={{ transform: `scaleY(${progress})` }} />
+      </span>
+      <ol className="execution-rail__labels">
+        {chapters.map((chapter) => (
+          <li key={chapter.id} className={active === chapter.id ? "is-active" : ""}>
+            <a href={`#${chapter.id}`} aria-current={active === chapter.id ? "location" : undefined}>
+              <span>{chapter.number}</span>
+              <ScrambleText text={chapter.label} hover onView={false} duration={400} />
+            </a>
+          </li>
+        ))}
+      </ol>
+    </aside>
   );
 }

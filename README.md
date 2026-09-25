@@ -11,9 +11,25 @@ npm install
 npm run dev
 ```
 
-## Content
+## Edit content with Sanity
 
-All copy and links live in `data/`:
+The existing design now reads its editable content from Sanity. The separate
+Studio in `studio/` provides one **Edit website** document for projects,
+experience, about, images, links, creative work, and other repeated content.
+Published changes refresh through the site's 60-second cache; drafts stay private
+to Studio. Without Sanity configuration, the site still runs with its bundled content.
+
+See **[Sanity setup and editing guide](docs/SANITY.md)** to create the new Sanity
+project, import the current portfolio, run Studio, and connect the deployed site.
+The account/project setup is required before Studio can connect.
+
+```bash
+npm run cms:export       # Preview the current content locally; no credentials needed
+npm run studio:install  # Install the standalone Studio's dependencies
+npm run studio          # Start Studio after setting its project ID
+```
+
+The original content remains in `data/` as migration input and a fallback:
 
 | File | Drives |
 | --- | --- |
@@ -25,7 +41,9 @@ All copy and links live in `data/`:
 | `data/socialLinks.ts` | Social profile links |
 | `data/socialCounts.ts` | Scraped follower profiles, refresh interval, and confirmed fallback counts |
 
-The resume download lives at `public/Awad_Buisir_Resume.pdf`.
+The bundled resume lives at `public/Awad_Buisir_Resume.pdf`. The CMS import uploads
+it and the site's local images to Sanity; existing demo videos keep their local
+URLs by default. Future image and resume replacements can be uploaded in Studio.
 
 ## Public follower counts
 
@@ -51,7 +69,7 @@ cache can be returned while a refresh runs. The CDN caches responses for 30 seco
 All follower displays (reach card, metric row, globe, and inline audience copy)
 subscribe to one client store and one five-minute polling timer. The UI shows
 three platform counts and matching profile buttons without source-status labels.
-Approximate values retain the ≈ marker. `data/socialCounts.ts` contains September 4
+Counts are shown without an approximation marker. `data/socialCounts.ts` contains September 4
 snapshots: Instagram ~26K, TikTok 11,965, and owner-confirmed Facebook 17,042.
 Facebook currently exposes likes, not followers, in its public metadata; it
 retains the confirmed snapshot until an explicit follower count is available.

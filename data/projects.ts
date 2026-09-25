@@ -73,9 +73,9 @@ export const projects: Project[] = [
   {
     slug: "libyamed-dispatch",
     title: "LibyaMed Dispatch",
-    description: "A bilingual, safety-first AI incident-intake platform for controlled hospital and government demonstrations.",
+    description: "A bilingual English–Arabic voice agent and dispatcher dashboard for emergency-call intake, built for supervised hospital and government demos.",
     summary:
-      "LibyaMed Dispatch is an AI-assisted emergency-call intake dashboard built for controlled demonstrations. Its voice agent begins in English and switches between English and Arabic with the caller, using high-quality speech recognition, patient turn-taking, noise handling, and low-latency Flash speech. The system combines a real-time incident feed, secure one-time location requests, audit logs, and per-step latency telemetry. A GPS issue in demo mode was identified and fixed: real inbound demo calls can send WhatsApp location links, while the simulator remains permanently isolated from real phone numbers. The production build reduced local runtime memory from roughly 5.1 GB in development to about 117 MB and passed 49 unit tests, 6 end-to-end browser tests, linting, a production build, and live configuration verification.",
+      "An AI-assisted intake dashboard for emergency calls, built for controlled demonstrations. The voice agent starts in English and switches between English and Arabic with the caller, with patient turn-taking, noise handling, and low-latency speech. Dispatchers get a live incident feed, one-time secure location requests, audit logs, and timing for every step. I found and fixed a demo-mode GPS bug: real inbound demo calls can now send WhatsApp location links, while the simulator stays isolated from real phone numbers. The production build cut local memory use from about 5.1 GB in development to about 117 MB, and it passes 49 unit tests, 6 end-to-end browser tests, linting, and live configuration checks.",
     media: "/demos/DispatchDemo.mp4",
     poster: "/demos/posters/dispatch-demo.jpg",
     tags: ["Next.js + TypeScript", "ElevenLabs", "Twilio + WhatsApp"],
@@ -117,14 +117,14 @@ export const projects: Project[] = [
   {
     slug: "ai-voice-receptionist",
     title: "AI Voice Receptionist",
-    description: "Answers real customer calls and books appointments end to end — no human in the loop.",
+    description: "Captures caller details, checks availability, books the appointment, and confirms it, with no staff in the loop.",
     summary:
       "A voice agent built for a real service business. It answers inbound calls, works out what the caller needs, checks live availability against Google Calendar, and books the appointment in a single call. ElevenLabs drives the speech layer; every scheduling action runs through deterministic webhooks so the model can never invent an opening. Client build — the code stays private, but I can demo it live on request.",
     media: null,
     tags: ["ElevenLabs", "Webhooks", "Google Calendar API"],
     disciplines: ["ai", "automation"],
     proof: "Private client system",
-    outcome: "Handles phone intake, availability checks, and booking for a real business with no manual handoff.",
+    outcome: "Captures caller details, checks availability, creates appointments, and returns booking confirmations without staff intervention.",
     stack: [
       {
         label: "Conversation",
@@ -149,10 +149,10 @@ export const projects: Project[] = [
   },
   {
     slug: "soccer-vision-system",
-    title: "Soccer Vision System",
+    title: "Soccer Vision Analytics",
     description: "A YOLOv8 pipeline that tracks every player in match footage and auto-cuts highlights.",
     summary:
-      "A computer-vision pipeline: YOLOv8 detects players frame by frame, a multi-object tracker keeps identities stable through occlusions and camera movement, and a highlight stage cuts clips around key moments. Hours of raw match film become tracked movement data and shareable edits with no manual scrubbing. The code is private — the demo shows the pipeline running on real footage.",
+      "A computer-vision pipeline: YOLOv8 detects players frame by frame, a multi-object tracker keeps identities stable through occlusions and camera movement, and a highlight stage cuts clips around key moments. Hours of raw match film become tracked movement data, performance insights, and shareable edits with no manual scrubbing. The code is private — the demo shows the pipeline running on real footage.",
     media: "/demos/SoccerDemo.mp4",
     poster: "/demos/posters/soccer-vision.jpg",
     contextImage: "/assets/personal/awad-soccer.jpg",
@@ -161,7 +161,7 @@ export const projects: Project[] = [
     tags: ["YOLOv8", "Computer Vision", "Tracking"],
     disciplines: ["ai"],
     proof: "Working video demo",
-    outcome: "Converts full match recordings into stable player tracks and automatically selected highlight clips.",
+    outcome: "Converts full match recordings into player-movement maps, automatically selected highlights, and performance insights.",
     stack: [
       {
         label: "Detection",
@@ -186,10 +186,10 @@ export const projects: Project[] = [
   },
   {
     slug: "llm-content-engine",
-    title: "LLM Content Engine",
+    title: "LLM Content System",
     description: "Plans, voices, sources, renders, and QA-checks complete videos in one local-first pipeline.",
     summary:
-      "A local-first content engine that turns a niche into upload-ready video. It researches, writes, plans scenes, generates voiceover, sources footage, renders captions, and blocks release until a QA pass succeeds. Every stage streams progress to the interface and writes an inspectable job record, so the AI workflow behaves like a production system instead of one opaque prompt.",
+      "A local-first content engine that turns a niche into upload-ready video. It researches, writes, plans scenes, generates voiceover, sources footage, renders captions, and blocks release until a QA pass succeeds. Ideas, scripts, titles, and captions are tuned by feedback loops on retention and engagement metrics. Every stage streams progress to the interface and writes an inspectable job record, so the AI workflow behaves like a production system instead of one opaque prompt.",
     media: "/demos/DEMO.mp4",
     poster: "/demos/posters/llm-content-engine.jpg",
     tags: ["OpenAI", "Express + SSE", "FFmpeg"],

@@ -6,14 +6,28 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "studio:install": "npm --prefix studio ci",
+    "studio": "npm --prefix studio run dev",
+    "studio:build": "npm --prefix studio run build",
+    "studio:deploy": "npm --prefix studio run deploy",
+    "cms:export": "node --import tsx scripts/seed-sanity.ts --dry-run",
+    "cms:seed": "node --import tsx scripts/seed-sanity.ts",
+    "test": "node --import tsx --test tests/sanity-content.test.ts tests/sanity-render.test.tsx && node --test tests/social-counts.test.cjs",
+    "cms:validate": "npm run cms:export && npm --prefix studio run validate:seed",
+    "cms:seed:login": "npm --prefix studio run import:content",
+    "cms:sync": "node --import tsx scripts/sync-sanity.ts",
+    "cms:sync:login": "npm --prefix studio run sync:content --"
   },
   "dependencies": {
+    "@sanity/client": "^8.7.0",
+    "@sanity/image-url": "^2.1.1",
     "framer-motion": "^12.23.0",
     "lucide-react": "^0.468.0",
     "next": "^15.3.4",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -22,6 +36,10 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

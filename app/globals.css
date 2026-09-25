@@ -10,6 +10,7 @@
   --muted-text: #666b75;
   --dim-text: #737783;
   --border: #e3e4e8;
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -108,33 +109,6 @@ summary:focus-visible {
   scroll-margin-top: 92px;
 }
 
-.route-mobile {
-  position: fixed;
-  inset: 4rem 0 auto;
-  z-index: 49;
-  height: 2px;
-  background: rgba(17, 26, 74, 0.1);
-}
-
-.route-mobile__fill {
-  position: absolute;
-  inset: 0;
-  background: #44b48b;
-  transform-origin: left;
-  transition: transform 100ms linear;
-}
-
-.route-mobile__label {
-  position: absolute;
-  right: 1rem;
-  top: 0.5rem;
-  color: #7c7f88;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 8px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 /* Wide-screen story rail. Its fill is tied directly to document scroll. */
 .execution-rail {
   position: fixed;
@@ -188,7 +162,7 @@ summary:focus-visible {
   text-transform: uppercase;
 }
 
-.execution-rail__labels li span {
+.execution-rail__labels li a > span:first-child {
   color: #a9acb6;
   font-size: 8px;
 }
@@ -222,37 +196,12 @@ summary:focus-visible {
     left: max(24px, calc((100vw - 88rem) / 2 - 5.5rem));
   }
 
-  .route-mobile {
-    display: none;
-  }
-}
-
-@supports not (animation-timeline: scroll()) {
-  .execution-rail__progress {
-    opacity: 0.25;
-    transform: scaleY(1);
-  }
 }
 
 @media (max-width: 639px) {
   body {
     background-attachment: scroll;
   }
-}
-
-/* Keep native project view transitions scoped to the expanding case file. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-group(project-0),
-::view-transition-group(project-1),
-::view-transition-group(project-2),
-::view-transition-group(project-3) {
-  animation-duration: 360ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Native <details> chevron off — Experience section draws its own. */
@@ -263,6 +212,235 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
+/* ─── Motion system ──────────────────────────────────────────────────────
+   Everything below animates transform/opacity only, renders its final
+   state in server HTML, and collapses to that state under reduced motion. */
+
+/* Hero headline: each word rises out of its own mask on first paint. CSS
+   (not JS) so the headline animates before hydration and never flashes. */
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.word-rise {
+  display: inline-block;
+  animation: word-rise 1s var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes word-rise {
+  from {
+    transform: translateY(110%) rotate(4deg);
+  }
+}
+
+.fade-rise {
+  animation: fade-rise 0.9s var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* Animated gradient ink for a single accent word. */
+.ink-shift {
+  background: linear-gradient(100deg, #167e6c, #44b48b 30%, #88deeb 50%, #1e4199 70%, #167e6c);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ink-shift 7s linear infinite;
+}
+
+/* Same sweep, tuned for dark surfaces (no deep blue stop). */
+.ink-shift-bright {
+  background: linear-gradient(100deg, #94efb7, #88deeb 35%, #ffffff 50%, #88deeb 65%, #94efb7);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ink-shift 7s linear infinite;
+}
+
+@keyframes ink-shift {
+  to {
+    background-position: -250% 0;
+  }
+}
+
+/* Live-status ping around availability dots. */
+.status-ping {
+  position: relative;
+}
+
+.status-ping::after {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: inherit;
+  content: "";
+  animation: status-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes status-ping {
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+
+/* Odometer digits. Server HTML parks each column on its final digit; the
+   roll only moves the column, so a failed animation still shows the truth. */
+.digit {
+  position: relative;
+  display: inline-block;
+  height: 1.1em;
+  overflow: hidden;
+  line-height: 1.1em;
+  vertical-align: bottom;
+  -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+}
+
+.digit-static {
+  display: inline-block;
+  height: 1.1em;
+  line-height: 1.1em;
+  white-space: pre;
+}
+
+.digit__column {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc((var(--digit) + 10) * -1.1em));
+  transition: transform 1.4s var(--ease-out-expo);
+}
+
+.digit__column > span {
+  height: 1.1em;
+  text-align: center;
+}
+
+.digit__column.is-rolling {
+  /* backwards, not both: once finished, live value changes transition. */
+  animation: digit-roll 1.6s var(--ease-out-expo) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes digit-roll {
+  from {
+    transform: translateY(0);
+  }
+}
+
+/* Pointer spotlight: SpotlightLayer writes --spot-x/--spot-y on hover. */
+/* Pair with a positioned element (Tailwind relative/absolute/sticky). */
+.spotlight {
+  isolation: isolate;
+}
+
+.spotlight::before {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    var(--spot-size, 420px) circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    var(--spot-color, rgba(68, 180, 139, 0.14)),
+    transparent 65%
+  );
+  content: "";
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+.spotlight-dark {
+  --spot-color: rgba(136, 222, 235, 0.12);
+  --spot-size: 640px;
+}
+
+/* A signal pulse travelling along a system layer's top edge. */
+.signal-line {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  overflow: hidden;
+}
+
+.signal-line::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #44b48b, #88deeb, transparent);
+  content: "";
+  transform: translateX(-100%);
+  animation: signal-pass 2.8s var(--ease-out-expo) infinite;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes signal-pass {
+  0% {
+    transform: translateX(-100%);
+  }
+  45%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.scale-rise {
+  animation: scale-rise 1.4s var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes scale-rise {
+  from {
+    opacity: 0;
+    transform: scale(0.9) rotate(-6deg);
+  }
+}
+
+/* Slow drifting light behind the footer wordmark. */
+.aurora {
+  animation: aurora 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora {
+  to {
+    transform: translate3d(-12%, 8%, 0) scale(1.15);
+  }
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(17, 26, 74, 0.35);
+}
+
+.blink-caret {
+  animation: blink-caret 1s steps(2, start) infinite;
+}
+
+@keyframes blink-caret {
+  to {
+    visibility: hidden;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -271,6 +449,7 @@ details > summary::-webkit-details-marker {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
@@ -279,5 +458,10 @@ details > summary::-webkit-details-marker {
     animation: none;
     opacity: 0.35;
     transform: scaleY(0.25);
+  }
+
+  .status-ping::after,
+  .signal-line::after {
+    display: none;
   }
 }

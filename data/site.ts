@@ -1,63 +1,79 @@
 export const navItems = [
   { label: "Work", href: "#work" },
-  { label: "Community", href: "#community" },
-  { label: "LinkedIn", href: "#linkedin" },
   { label: "Experience", href: "#experience" },
-  { label: "AI Creative", href: "#creative" },
+  { label: "LibyanClub", href: "#community" },
+  { label: "Creative", href: "#creative" },
   { label: "Contact", href: "#contact" }
 ];
 
 export const hero = {
-  eyebrow: "CS @ Northeastern · Boston",
-  availability: "Open to internships, co-ops & project work",
-  headline: "I build software, AI workflows, and media systems that create visible impact.",
+  eyebrow: "Computer Science at Northeastern · Boston",
+  // TODO(user): once the co-op wraps (Dec 18, 2026), switch this to the next term you're recruiting for.
+  availability: "Now: AI SWE Co-op @ NExT Consulting",
+  headline: "I build AI that answers phones and watches game film.",
   subheadline:
-    "I turn operational problems into working products — from voice agents and computer vision to media systems used at scale."
+    "I'm Awad Buisir, a computer science student at Northeastern. Recently I built a bilingual English–Arabic voice agent for emergency-call intake, a phone receptionist that books real appointments, and a YOLOv8 pipeline that turns full soccer matches into highlight clips."
 };
 
 export const about = {
   lines: [
-    "Computer science at Northeastern.",
-    "I turn ideas into software, automated systems, and audiences that grow."
+    "I study computer science at Northeastern (3.84 GPA, Dean's List) and graduate in August 2027.",
+    "This fall I'm an AI Software Engineer co-op at NExT Consulting, building AI-enabled tools for client engagements. Since 2023 I've also run IT for AL Prime Energy across 70 sites and 1,000+ cameras, so I'm used to keeping systems working long after launch."
   ],
   pillars: [
     {
       word: "Build",
-      line: "Web apps, APIs, internal tools.",
-      proof: "70 sites supported",
-      signal: "Web · APIs · distributed IT"
+      line: "Applied-AI products: voice agents, vision pipelines, and LLM tools.",
+      proof: "5 projects",
+      signal: "LibyaMed Dispatch · Voice Receptionist · Soccer Vision"
     },
     {
       word: "Automate",
-      line: "LLMs, voice AI, vision, workflows.",
+      line: "Scripts and event-driven tools that remove manual steps.",
       proof: "30 hrs/week saved",
-      signal: "Built for a live media operation"
+      signal: "About 30 hours a week saved at Ya Hala FM"
     },
     {
-      word: "Grow",
-      line: "Campaigns, analytics, community.",
-      proof: "35K+ community",
-      signal: "12M+ views · 1.3M+ engagement"
+      word: "Operate",
+      line: "Infrastructure a business runs on, and a media operation with a live audience.",
+      proof: "70 sites supported",
+      signal: "70 sites at AL Prime Energy · 35K+ followers at LibyanClub"
     }
   ]
 };
 
 export const community = {
   title: "LibyanClub",
-  role: "Founder & President — Northeastern University",
+  role: "Founder & President, Northeastern University",
   copy:
-    "Founded at Northeastern as America's first Libyan student club. Now a 31K+ network connecting Libyan students worldwide around the country's future.",
+    "I founded LibyanClub at Northeastern in November 2025, the first Libyan student association in the US. Within six months it became the most-followed club page at Northeastern. I also built the system behind its content: AI-assisted drafts, a steady publishing schedule, and an analytics review that decides what we post next.",
   /** Square LibyanClub profile logo, shown beside the section heading. */
   crest: "/assets/libyanclub-logo.jpg",
   /** Transparent gold crest used as the low-opacity watermark. */
   watermark: "/assets/libyanclub-crest-gold.png",
   built: [
+    "AI-assisted content pipeline with a feedback loop",
+    "Analytics review that sets the next brief",
+    "Publishing schedule and post formats",
     "Brand identity",
-    "Short-form content system",
-    "Event campaigns",
-    "Growth strategy",
-    "Cross-platform community presence"
-  ]
+    "Distribution across Instagram, TikTok, and Facebook",
+    "Coordination among new Libyan student groups nationwide"
+  ],
+  /** Resume highlight: the #CleanLibya campaign. */
+  campaign: {
+    eyebrow: "Campaign I launched",
+    title: "#CleanLibya",
+    copy: "A grassroots cleanup challenge that grew from four friends to thousands of participants and supporters across six Libyan cities, and earned national television coverage.",
+    photo: "/assets/personal/cleanlibya-tv.jpg",
+    photoAlt: "Awad Buisir interviewed on Libya's Al Wataniya TV about the Clean Libya initiative, with the Libyan flag behind him",
+    photoCaption: "Al Wataniya TV · Interview with the founder of Clean Libya",
+    stats: [
+      { value: "4", label: "Friends at the start" },
+      { value: "1,000s", label: "Participants & supporters" },
+      { value: "6", label: "Libyan cities" },
+      { value: "TV", label: "National coverage" }
+    ]
+  }
 };
 
 export type Experience = {
@@ -70,66 +86,83 @@ export type Experience = {
 
 export const experiences: Experience[] = [
   {
+    company: "NExT Consulting",
+    role: "AI Software Engineer Co-op",
+    dates: "Sep 2026 — Dec 2026",
+    summary: "AI-enabled applications and internal tools for client engagements · Northeastern University",
+    details: [
+      "Develop AI-enabled applications and internal tools for client engagements, contributing across requirements discovery, solution design, implementation, testing, and stakeholder handoff.",
+      "Translate business needs into technical requirements, API integrations, and rapid prototypes while collaborating within an Agile consulting team.",
+      "Build reusable components, document technical decisions, and evaluate AI-assisted workflows for reliability, usability, and maintainability."
+    ]
+  },
+  {
     company: "AL Prime Energy",
     role: "IT Systems Administrator",
     dates: "May 2023 — Present",
-    summary: "70 sites · 1,000+ cameras · distributed IT systems",
+    summary: "70 sites and 1,000+ cameras across Massachusetts",
     details: [
-      "Security, network, hardware, and fuel-pump support across Massachusetts.",
-      "Digital Watchdog, iCMSpro, and Socatch camera platforms."
+      "Administer IT, networking, surveillance, and fuel-pump technology across 70 sites and 1,000+ cameras, supporting Digital Watchdog, iCMSpro, Socatch, and Rubis systems.",
+      "Diagnose and resolve network connectivity, hardware, software, and camera-system incidents across distributed locations to minimize downtime and maintain operations.",
+      "Support fuel-pump systems where downtime directly halts revenue, prioritizing incidents by business impact."
+      // TODO(user): add a 4th bullet only if true (e.g. a monitoring script or standardized rollout you built)
     ]
   },
   {
     company: "Ya Hala FM",
     role: "AI Software Engineer Intern",
     dates: "May 2024 — Aug 2024",
-    summary: "4,000+ song library · 30 hrs/week saved · AI-assisted automation",
+    summary: "Automated about 30 hours a week of manual media work",
     details: [
-      "Automated cloud and local media workflows for a Dallas radio station.",
-      "Scripting, file organization, QA, and debugging."
+      "Built automation scripts and internal tools to organize a 4,000+ song media library across cloud and local storage, eliminating approximately 30 hours of manual organization per week.",
+      "Developed, tested, and debugged repeatable workflows for sorting, renaming, and validating media assets across cloud and local storage environments."
     ]
   }
 ];
 
-export type CreativeItem = {
-  title: string;
-  category: string;
-  image: string;
-};
-
-export const creativeGallery: CreativeItem[] = [
-  { title: "LibyanClub UN Trip Campaign", category: "Campaign visuals", image: "/assets/gallery/cultural-campaign.svg" },
-  { title: "Short-form Sports Edits", category: "Video edits", image: "/assets/gallery/sports-edit-real.jpg" },
-  { title: "MSA Madness Event Identity", category: "Event identity", image: "/assets/gallery/event-identity.svg" },
-  { title: "Libyan National Team Concept Kit", category: "Brand concept", image: "/assets/gallery/national-team-kit.jpg" },
-  { title: "LibyanClub Reels System", category: "Content system", image: "/assets/gallery/short-form-board.svg" },
-  { title: "Community Analytics Graphics", category: "Social graphics", image: "/assets/gallery/community-analytics.svg" }
-];
-
 export const skillGroups = [
-  { title: "Code", skills: ["Python", "Java", "JavaScript", "HTML/CSS"] },
+  { title: "Programming", skills: ["Python", "Java", "JavaScript", "TypeScript", "HTML/CSS"] },
   {
-    title: "AI / Automation",
-    skills: ["LLMs", "Prompt Engineering", "Computer Vision", "Workflow Automation", "ElevenLabs"]
+    title: "AI Engineering",
+    skills: [
+      "LLM applications",
+      "AI agents",
+      "Prompt engineering",
+      "Computer vision (YOLOv8)",
+      "Voice agents (ElevenLabs)",
+      "Workflow automation"
+    ]
   },
   {
-    title: "Platforms",
-    skills: ["Git/GitHub", "Google Calendar API", "Twilio", "Zapier", "Google Apps Script", "Shopify"]
+    title: "Frameworks & Platforms",
+    skills: [
+      "Next.js / React",
+      "Tailwind CSS",
+      "Supabase",
+      "Vercel",
+      "Render",
+      "Git/GitHub",
+      "Twilio",
+      "Google Calendar API",
+      "Google Apps Script",
+      "Zapier",
+      "Shopify"
+    ]
   },
+  { title: "APIs & Testing", skills: ["REST APIs", "Webhooks", "Unit testing", "End-to-end testing", "Agile development"] },
   {
     title: "Creative",
     skills: ["Photoshop", "Illustrator", "Premiere Pro", "After Effects", "Lightroom"]
   },
-  { title: "Languages", skills: ["Arabic", "English", "Spanish (conversational)"] }
+  { title: "Spoken Languages", skills: ["Arabic", "English", "Spanish (conversational)"] }
 ];
 
 export const contact = {
-  line: "Open to software, AI, creative technology, and community-driven opportunities.",
+  line: "Hiring for software or applied-AI roles? I'd like to hear about it. I can demo any private project live or walk you through the code.",
   email: "buisir.a@northeastern.edu",
   location: "Boston, MA",
-  linkedin: "https://www.linkedin.com/in/awad-buisir-0221a41ab/",
-  // TODO: add real GitHub profile URL
-  github: "https://github.com/ABuisir10",
+  linkedin: "https://www.linkedin.com/in/awad-buisir/",
+  github: "https://github.com/AwadBuisir10",
   instagram: "https://www.instagram.com/awadbuisir/",
   resume: "/Awad_Buisir_Resume.pdf"
 };
